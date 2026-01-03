@@ -1,0 +1,3 @@
+The Software Metrics Dashboard is a full-stack web application designed to monitor, analyze, and visualize software quality metrics in a centralized and interactive way. The project helps developers and teams gain better insights into code quality, maintainability, and potential risks during software development.
+
+This dashboard integrates static code analysis data and presents it through intuitive charts and metrics, enabling faster decision-making and improved software quality assurance.
