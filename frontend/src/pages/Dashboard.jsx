@@ -38,12 +38,14 @@ function Dashboard() {
         >
           {DASHBOARD_KPI_DATA.map((item, index) => (
             <MetricCard
-              key={index}
-              title={item.title}
-              value={item.value}
-              color={item.color}
-              icon={item.icon}
-            />
+            key={index}
+            title={item.title}
+            value={item.value}
+            color={item.color}
+            icon={item.icon}
+            subtitle={item.subtitle}
+           />
+
           ))}
         </div>
       </section>

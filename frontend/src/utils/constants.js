@@ -3,28 +3,33 @@ export const DASHBOARD_KPI_DATA = [
   {
     title: "Total Bugs",
     value: "12",
+    subtitle: "Open defects in project",
     color: "#ef4444",
     icon: "🐞",
   },
   {
     title: "Test Coverage",
     value: "75%",
+    subtitle: "Code covered by tests",
     color: "#3b82f6",
     icon: "🧪",
   },
   {
     title: "Build Status",
     value: "PASS",
+    subtitle: "Last pipeline result",
     color: "#10b981",
     icon: "✅",
   },
   {
     title: "Commits",
     value: "148",
+    subtitle: "Total code changes",
     color: "#8b5cf6",
     icon: "📦",
   },
 ];
+
 
 
 // 🆕 Bug Severity Chart data
