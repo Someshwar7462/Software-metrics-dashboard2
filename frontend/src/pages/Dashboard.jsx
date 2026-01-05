@@ -1,5 +1,9 @@
 import React from "react";
 
+//Navbar
+import Navbar from "../components/common/Navbar";
+
+
 // KPI Card
 import MetricCard from "../components/cards/MetricCard";
 
@@ -13,6 +17,10 @@ import { DASHBOARD_KPI_DATA } from "../utils/constants";
 
 function Dashboard() {
   return (
+    <div style={{ minHeight: "100vh", backgroundColor: "#f1f5f9" }}>
+      {/* NAVBAR ONLY */}
+      <Navbar />
+
     <div
       style={{
         padding: "30px",
@@ -101,6 +109,7 @@ function Dashboard() {
           <BugSeverityPieChart />
         </div>
       </section>
+    </div>
     </div>
   );
 }
