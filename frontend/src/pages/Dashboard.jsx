@@ -20,88 +20,85 @@ function Dashboard() {
         minHeight: "100vh",
       }}
     >
-      {/* ================= TITLE ================= */}
-      <h1
-        style={{
-          fontSize: "28px",
-          fontWeight: "bold",
-          marginBottom: "30px",
-        }}
-      >
+      {/* ================= PAGE TITLE ================= */}
+      <h1 style={{ fontSize: "28px", fontWeight: "bold", marginBottom: "30px" }}>
         Software Metrics Dashboard
       </h1>
 
-      {/* ================= KPI CARDS ================= */}
-      <div
-        style={{
-          display: "grid",
-          gridTemplateColumns: "repeat(4, 1fr)",
-          gap: "20px",
-          marginBottom: "40px",
-        }}
-      >
-        {DASHBOARD_KPI_DATA.map((item, index) => (
-          <MetricCard
-            key={index}
-            title={item.title}
-            value={item.value}
-            color={item.color}
-            icon={item.icon}
-          />
-        ))}
-      </div>
+      {/* ================= OVERVIEW SECTION ================= */}
+      <section style={{ marginBottom: "40px" }}>
+        <h2 style={{ marginBottom: "20px" }}>Overview</h2>
 
-      {/* ================= CHARTS SECTION ================= */}
-      <div
-        style={{
-          display: "grid",
-          gridTemplateColumns: "repeat(2, 1fr)",
-          gap: "20px",
-        }}
-      >
-        {/* Bug Severity Pie Chart */}
+        <div
+          style={{
+            display: "grid",
+            gridTemplateColumns: "repeat(4, 1fr)",
+            gap: "20px",
+          }}
+        >
+          {DASHBOARD_KPI_DATA.map((item, index) => (
+            <MetricCard
+              key={index}
+              title={item.title}
+              value={item.value}
+              color={item.color}
+              icon={item.icon}
+            />
+          ))}
+        </div>
+      </section>
+
+      {/* ================= TRENDS SECTION ================= */}
+      <section style={{ marginBottom: "40px" }}>
+        <h2 style={{ marginBottom: "20px" }}>Quality Trends</h2>
+
+        <div
+          style={{
+            display: "grid",
+            gridTemplateColumns: "1fr 1fr",
+            gap: "20px",
+          }}
+        >
+          <div
+            style={{
+              backgroundColor: "white",
+              padding: "20px",
+              borderRadius: "10px",
+            }}
+          >
+            <h3>Test Coverage Trend</h3>
+            <TestCoverageLineChart />
+          </div>
+
+          <div
+            style={{
+              backgroundColor: "white",
+              padding: "20px",
+              borderRadius: "10px",
+            }}
+          >
+            <h3>Commits Per Month</h3>
+            <CommitsBarChart />
+          </div>
+        </div>
+      </section>
+
+      {/* ================= ANALYSIS SECTION ================= */}
+      <section>
+        <h2 style={{ marginBottom: "20px" }}>Defect Analysis</h2>
+
         <div
           style={{
             backgroundColor: "white",
             padding: "20px",
             borderRadius: "10px",
+            width: "fit-content",
           }}
         >
-          <h3 style={{ marginBottom: "10px" }}>
-            Bug Severity Distribution
-          </h3>
+          <h3>Bug Severity Distribution</h3>
           <BugSeverityPieChart />
         </div>
-
-        {/* Test Coverage Line Chart */}
-        <div
-          style={{
-            backgroundColor: "white",
-            padding: "20px",
-            borderRadius: "10px",
-          }}
-        >
-          <h3 style={{ marginBottom: "10px" }}>
-            Test Coverage Trend
-          </h3>
-          <TestCoverageLineChart />
-        </div>
-
-        {/* Commits Bar Chart */}
-        <div
-          style={{
-            backgroundColor: "white",
-            padding: "20px",
-            borderRadius: "10px",
-            gridColumn: "1 / span 2", // full width
-          }}
-        >
-          <h3 style={{ marginBottom: "10px" }}>
-            Commits Per Month
-          </h3>
-          <CommitsBarChart />
-        </div>
-      </div>
+      </section>
     </div>
   );
 }
