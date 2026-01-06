@@ -1,5 +1,6 @@
 import React from "react";
 import Navbar from "../components/common/Navbar";
+import { useTheme } from "../context/ThemeContext";
 import MetricCard from "../components/cards/MetricCard";
 import BugSeverityPieChart from "../components/charts/BugSeverityPieChart";
 import TestCoverageLineChart from "../components/charts/TestCoverageLineChart";
@@ -7,57 +8,58 @@ import CommitsBarChart from "../components/charts/CommitsBarChart";
 import { DASHBOARD_KPI_DATA } from "../utils/constants";
 
 function Dashboard() {
+  const { darkMode } = useTheme();
+
+  const bg = darkMode ? "#020617" : "#f1f5f9";
+  const cardBg = darkMode ? "#020617" : "#ffffff";
+  const border = darkMode ? "1px solid #1e293b" : "none";
+
   return (
-    <div style={{ minHeight: "100vh", backgroundColor: "#f1f5f9" }}>
+    <div style={{ minHeight: "100vh", backgroundColor: bg }}>
       <Navbar />
 
       <div style={{ padding: "32px", maxWidth: "1200px", margin: "0 auto" }}>
-        {/* PAGE TITLE */}
-        <h1 style={{ fontSize: "28px", fontWeight: "600", marginBottom: "32px" }}>
+        <h1
+          style={{
+            fontSize: "28px",
+            fontWeight: "600",
+            marginBottom: "32px",
+            color: darkMode ? "#f8fafc" : "#020617",
+          }}
+        >
           Software Metrics Dashboard
         </h1>
 
-        {/* OVERVIEW */}
+        {/* KPI */}
         <section style={{ marginBottom: "48px" }}>
-          <h2 style={sectionTitle}>Overview</h2>
-
-          <div style={grid4}>
+          <div style={{ display: "grid", gridTemplateColumns: "repeat(4,1fr)", gap: "20px" }}>
             {DASHBOARD_KPI_DATA.map((item, index) => (
               <MetricCard
                 key={index}
-                title={item.title}
-                value={item.value}
-                subtitle={item.subtitle}
-                color={item.color}
-                icon={item.icon}
+                {...item}
               />
             ))}
           </div>
         </section>
 
-        {/* QUALITY TRENDS */}
+        {/* Charts */}
         <section style={{ marginBottom: "48px" }}>
-          <h2 style={sectionTitle}>Quality Trends</h2>
-
-          <div style={grid2}>
-            <div style={card}>
-              <h3 style={cardTitle}>Test Coverage</h3>
+          <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "20px" }}>
+            <div style={{ background: cardBg, padding: "20px", borderRadius: "12px", border }}>
+              <h3>Test Coverage</h3>
               <TestCoverageLineChart />
             </div>
 
-            <div style={card}>
-              <h3 style={cardTitle}>Commits</h3>
+            <div style={{ background: cardBg, padding: "20px", borderRadius: "12px", border }}>
+              <h3>Commits</h3>
               <CommitsBarChart />
             </div>
           </div>
         </section>
 
-        {/* DEFECT ANALYSIS */}
         <section>
-          <h2 style={sectionTitle}>Defect Analysis</h2>
-
-          <div style={{ ...card, width: "fit-content" }}>
-            <h3 style={cardTitle}>Bug Severity</h3>
+          <div style={{ background: cardBg, padding: "20px", borderRadius: "12px", border, width: "fit-content" }}>
+            <h3>Bug Severity</h3>
             <BugSeverityPieChart />
           </div>
         </section>
@@ -65,37 +67,5 @@ function Dashboard() {
     </div>
   );
 }
-
-/* ---- styles ---- */
-
-const sectionTitle = {
-  fontSize: "18px",
-  fontWeight: "600",
-  marginBottom: "20px",
-};
-
-const grid4 = {
-  display: "grid",
-  gridTemplateColumns: "repeat(4, 1fr)",
-  gap: "20px",
-};
-
-const grid2 = {
-  display: "grid",
-  gridTemplateColumns: "1fr 1fr",
-  gap: "20px",
-};
-
-const card = {
-  backgroundColor: "white",
-  padding: "20px",
-  borderRadius: "12px",
-};
-
-const cardTitle = {
-  fontSize: "15px",
-  fontWeight: "600",
-  marginBottom: "10px",
-};
 
 export default Dashboard;

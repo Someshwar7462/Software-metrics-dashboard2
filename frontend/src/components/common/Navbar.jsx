@@ -1,8 +1,8 @@
-import React, { useState } from "react";
+import React from "react";
+import { useTheme } from "../../context/ThemeContext";
 
 function Navbar() {
-  const [darkMode, setDarkMode] = useState(false);
-  const [notifications] = useState(3); // dummy count
+  const { darkMode, toggleTheme } = useTheme();
 
   return (
     <header
@@ -17,10 +17,9 @@ function Navbar() {
         borderBottom: darkMode
           ? "1px solid #1e293b"
           : "1px solid #e5e7eb",
-        transition: "all 0.3s ease",
       }}
     >
-      {/* LEFT: App Name */}
+      {/* LEFT */}
       <div style={{ fontSize: "18px", fontWeight: "600" }}>
         Software Metrics Dashboard
       </div>
@@ -28,52 +27,46 @@ function Navbar() {
       {/* CENTER: Search */}
       <input
         type="text"
-        placeholder="Search metrics / repo..."
+        placeholder="Search metrics..."
         style={{
-          width: "260px",
+          width: "220px",
           padding: "6px 10px",
           borderRadius: "6px",
-          border: darkMode ? "1px solid #334155" : "1px solid #cbd5f5",
+          border: darkMode ? "1px solid #334155" : "1px solid #cbd5e1",
           backgroundColor: darkMode ? "#020617" : "#ffffff",
           color: darkMode ? "#f8fafc" : "#020617",
-          outline: "none",
         }}
       />
 
-      {/* RIGHT: Actions */}
+      {/* RIGHT */}
       <div style={{ display: "flex", alignItems: "center", gap: "16px" }}>
-        {/* Repo Info */}
-        <span style={{ fontSize: "13px", opacity: 0.85 }}>
+        <span style={{ fontSize: "13px" }}>
           📦 Repo: <strong>Not Selected</strong>
         </span>
 
-        {/* Notifications */}
-        <div style={{ position: "relative", cursor: "pointer" }}>
+        <span style={{ position: "relative", cursor: "pointer" }}>
           🔔
-          {notifications > 0 && (
-            <span
-              style={{
-                position: "absolute",
-                top: "-6px",
-                right: "-8px",
-                backgroundColor: "#ef4444",
-                color: "white",
-                fontSize: "10px",
-                padding: "2px 6px",
-                borderRadius: "999px",
-              }}
-            >
-              {notifications}
-            </span>
-          )}
-        </div>
+          <span
+            style={{
+              position: "absolute",
+              top: "-6px",
+              right: "-8px",
+              backgroundColor: "#ef4444",
+              color: "white",
+              fontSize: "10px",
+              padding: "2px 6px",
+              borderRadius: "999px",
+            }}
+          >
+            3
+          </span>
+        </span>
 
-        {/* Dark / Light Toggle */}
         <button
-          onClick={() => setDarkMode(!darkMode)}
+          onClick={toggleTheme}
           style={{
             background: "transparent",
-            border: darkMode ? "1px solid #334155" : "1px solid #cbd5f5",
+            border: darkMode ? "1px solid #334155" : "1px solid #cbd5e1",
             padding: "6px 10px",
             borderRadius: "6px",
             cursor: "pointer",
@@ -83,7 +76,6 @@ function Navbar() {
           {darkMode ? "☀ Light" : "🌙 Dark"}
         </button>
 
-        {/* Logout */}
         <button
           style={{
             background: "transparent",
