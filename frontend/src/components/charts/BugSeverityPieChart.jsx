@@ -1,23 +1,40 @@
 import React from "react";
 import { PieChart, Pie, Cell, Tooltip } from "recharts";
-import { BUG_SEVERITY_DATA } from "../../utils/constants";
+import { useTheme } from "../../context/ThemeContext";
 
-const COLORS = ["#ef4444", "#f59e0b", "#10b981"];
+const data = [
+  { name: "Critical", value: 4 },
+  { name: "Major", value: 6 },
+  { name: "Minor", value: 2 },
+];
+
+const COLORS = ["#ef4444", "#f97316", "#22c55e"];
 
 function BugSeverityPieChart() {
+  const { darkMode } = useTheme();
+
   return (
-    <PieChart width={300} height={300}>
+    <PieChart width={300} height={240}>
       <Pie
-        data={BUG_SEVERITY_DATA}
+        data={data}
         dataKey="value"
-        nameKey="name"
-        outerRadius={100}
+        cx="50%"
+        cy="50%"
+        outerRadius={80}
+        label
       >
-        {BUG_SEVERITY_DATA.map((entry, index) => (
+        {data.map((_, index) => (
           <Cell key={index} fill={COLORS[index]} />
         ))}
       </Pie>
-      <Tooltip />
+
+      <Tooltip
+        contentStyle={{
+          backgroundColor: darkMode ? "#020617" : "#ffffff",
+          border: "none",
+          color: darkMode ? "#f8fafc" : "#020617",
+        }}
+      />
     </PieChart>
   );
 }

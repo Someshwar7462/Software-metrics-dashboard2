@@ -8,14 +8,26 @@ import {
   CartesianGrid,
 } from "recharts";
 import { TEST_COVERAGE_DATA } from "../../utils/constants";
+import { useTheme } from "../../context/ThemeContext";
 
 function TestCoverageLineChart() {
+  const { darkMode } = useTheme();
+
+  const textColor = darkMode ? "#f8fafc" : "#020617";
+  const gridColor = darkMode ? "#334155" : "#e5e7eb";
+
   return (
-    <LineChart width={400} height={250} data={TEST_COVERAGE_DATA}>
-      <CartesianGrid strokeDasharray="3 3" />
-      <XAxis dataKey="month" />
-      <YAxis />
-      <Tooltip />
+    <LineChart width={380} height={240} data={TEST_COVERAGE_DATA}>
+      <CartesianGrid stroke={gridColor} strokeDasharray="3 3" />
+      <XAxis dataKey="month" stroke={textColor} />
+      <YAxis stroke={textColor} />
+      <Tooltip
+        contentStyle={{
+          backgroundColor: darkMode ? "#020617" : "#ffffff",
+          border: "none",
+          color: textColor,
+        }}
+      />
       <Line
         type="monotone"
         dataKey="coverage"
