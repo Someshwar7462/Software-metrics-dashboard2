@@ -19,7 +19,7 @@ function Navbar() {
           : "1px solid #e5e7eb",
       }}
     >
-      {/* LEFT */}
+      {/* LEFT: App Name */}
       <div style={{ fontSize: "18px", fontWeight: "600" }}>
         Software Metrics Dashboard
       </div>
@@ -35,33 +35,17 @@ function Navbar() {
           border: darkMode ? "1px solid #334155" : "1px solid #cbd5e1",
           backgroundColor: darkMode ? "#020617" : "#ffffff",
           color: darkMode ? "#f8fafc" : "#020617",
+          outline: "none",
         }}
       />
 
-      {/* RIGHT */}
+      {/* RIGHT: Actions */}
       <div style={{ display: "flex", alignItems: "center", gap: "16px" }}>
-        <span style={{ fontSize: "13px" }}>
+        <span style={{ fontSize: "13px", opacity: 0.85 }}>
           📦 Repo: <strong>Not Selected</strong>
         </span>
 
-        <span style={{ position: "relative", cursor: "pointer" }}>
-          🔔
-          <span
-            style={{
-              position: "absolute",
-              top: "-6px",
-              right: "-8px",
-              backgroundColor: "#ef4444",
-              color: "white",
-              fontSize: "10px",
-              padding: "2px 6px",
-              borderRadius: "999px",
-            }}
-          >
-            3
-          </span>
-        </span>
-
+        {/* Dark / Light Toggle */}
         <button
           onClick={toggleTheme}
           style={{
@@ -76,6 +60,7 @@ function Navbar() {
           {darkMode ? "☀ Light" : "🌙 Dark"}
         </button>
 
+        {/* Logout */}
         <button
           style={{
             background: "transparent",
