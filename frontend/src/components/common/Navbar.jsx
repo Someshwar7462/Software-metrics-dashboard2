@@ -6,7 +6,13 @@ function Navbar() {
   const [open, setOpen] = useState(false);
   const dropdownRef = useRef(null);
 
-  // Close dropdown when clicking outside
+  // Dummy user (backend baad mein aayega)
+  const user = {
+    name: "Someshwar Gupta",
+    email: "someshwar@gmail.com",
+  };
+
+  // Close dropdown on outside click
   useEffect(() => {
     function handleClickOutside(e) {
       if (dropdownRef.current && !dropdownRef.current.contains(e.target)) {
@@ -96,12 +102,12 @@ function Navbar() {
                 position: "absolute",
                 right: 0,
                 top: "46px",
-                width: "160px",
+                width: "220px",
                 backgroundColor: darkMode ? "#020617" : "#ffffff",
                 border: darkMode
                   ? "1px solid #1e293b"
                   : "1px solid #e5e7eb",
-                borderRadius: "10px",
+                borderRadius: "12px",
                 boxShadow: darkMode
                   ? "0 10px 30px rgba(0,0,0,0.6)"
                   : "0 10px 20px rgba(0,0,0,0.15)",
@@ -109,6 +115,30 @@ function Navbar() {
                 zIndex: 100,
               }}
             >
+              {/* USER INFO */}
+              <div
+                style={{
+                  padding: "14px",
+                  borderBottom: darkMode
+                    ? "1px solid #1e293b"
+                    : "1px solid #e5e7eb",
+                }}
+              >
+                <div style={{ fontWeight: "600", fontSize: "14px" }}>
+                  {user.name}
+                </div>
+                <div
+                  style={{
+                    fontSize: "12px",
+                    opacity: 0.8,
+                    marginTop: "2px",
+                  }}
+                >
+                  {user.email}
+                </div>
+              </div>
+
+              {/* ACTIONS */}
               <DropdownItem label="✏️ Edit Profile" />
               <Divider darkMode={darkMode} />
               <DropdownItem label="🚪 Logout" danger />
@@ -120,7 +150,7 @@ function Navbar() {
   );
 }
 
-/* --- helpers --- */
+/* -------- Helpers -------- */
 
 function DropdownItem({ label, danger }) {
   return (
