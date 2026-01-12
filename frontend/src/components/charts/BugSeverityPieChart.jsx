@@ -1,5 +1,5 @@
 import React from "react";
-import { PieChart, Pie, Cell, Tooltip } from "recharts";
+import { PieChart, Pie, Cell, Tooltip, ResponsiveContainer } from "recharts";
 import { useTheme } from "../../context/ThemeContext";
 
 const data = [
@@ -14,28 +14,32 @@ function BugSeverityPieChart() {
   const { darkMode } = useTheme();
 
   return (
-    <PieChart width={300} height={240}>
-      <Pie
-        data={data}
-        dataKey="value"
-        cx="50%"
-        cy="50%"
-        outerRadius={80}
-        label
-      >
-        {data.map((_, index) => (
-          <Cell key={index} fill={COLORS[index]} />
-        ))}
-      </Pie>
+    <div style={{ width: 300, height: 260 }}>
+      <ResponsiveContainer>
+        <PieChart>
+          <Pie
+            data={data}
+            dataKey="value"
+            cx="50%"
+            cy="50%"
+            outerRadius={80}
+            label
+          >
+            {data.map((_, index) => (
+              <Cell key={index} fill={COLORS[index]} />
+            ))}
+          </Pie>
 
-      <Tooltip
-        contentStyle={{
-          backgroundColor: darkMode ? "#020617" : "#ffffff",
-          border: "none",
-          color: darkMode ? "#f8fafc" : "#020617",
-        }}
-      />
-    </PieChart>
+          <Tooltip
+            contentStyle={{
+              backgroundColor: darkMode ? "#020617" : "#ffffff",
+              border: "none",
+              color: darkMode ? "#f8fafc" : "#020617",
+            }}
+          />
+        </PieChart>
+      </ResponsiveContainer>
+    </div>
   );
 }
 

@@ -6,6 +6,7 @@ import {
   YAxis,
   Tooltip,
   CartesianGrid,
+  ResponsiveContainer,
 } from "recharts";
 import { TEST_COVERAGE_DATA } from "../../utils/constants";
 import { useTheme } from "../../context/ThemeContext";
@@ -17,24 +18,29 @@ function TestCoverageLineChart() {
   const gridColor = darkMode ? "#334155" : "#e5e7eb";
 
   return (
-    <LineChart width={380} height={240} data={TEST_COVERAGE_DATA}>
-      <CartesianGrid stroke={gridColor} strokeDasharray="3 3" />
-      <XAxis dataKey="month" stroke={textColor} />
-      <YAxis stroke={textColor} />
-      <Tooltip
-        contentStyle={{
-          backgroundColor: darkMode ? "#020617" : "#ffffff",
-          border: "none",
-          color: textColor,
-        }}
-      />
-      <Line
-        type="monotone"
-        dataKey="coverage"
-        stroke="#3b82f6"
-        strokeWidth={3}
-      />
-    </LineChart>
+    <div style={{ width: "100%", height: 260 }}>
+      <ResponsiveContainer>
+        <LineChart data={TEST_COVERAGE_DATA}>
+          <CartesianGrid stroke={gridColor} strokeDasharray="3 3" />
+          <XAxis dataKey="month" stroke={textColor} />
+          <YAxis stroke={textColor} />
+          <Tooltip
+            contentStyle={{
+              backgroundColor: darkMode ? "#020617" : "#ffffff",
+              border: "none",
+              color: textColor,
+            }}
+          />
+          <Line
+            type="monotone"
+            dataKey="coverage"
+            stroke="#3b82f6"
+            strokeWidth={3}
+            dot={{ fill: "#3b82f6" }}
+          />
+        </LineChart>
+      </ResponsiveContainer>
+    </div>
   );
 }
 
