@@ -4,15 +4,19 @@ import { useTheme } from "../../context/ThemeContext";
 function Navbar() {
   const { darkMode, toggleTheme } = useTheme();
   const [open, setOpen] = useState(false);
+  const [showModal, setShowModal] = useState(false);
   const dropdownRef = useRef(null);
 
-  // Dummy user (backend baad mein aayega)
-  const user = {
+  const [user, setUser] = useState({
     name: "Someshwar Gupta",
+    username: "someshwar_01",
     email: "someshwar@gmail.com",
-  };
+    phone: "9876543210",
+    currentPassword: "",
+    newPassword: "",
+    confirmPassword: "",
+  });
 
-  // Close dropdown on outside click
   useEffect(() => {
     function handleClickOutside(e) {
       if (dropdownRef.current && !dropdownRef.current.contains(e.target)) {
@@ -20,154 +24,238 @@ function Navbar() {
       }
     }
     document.addEventListener("mousedown", handleClickOutside);
-    return () => document.removeEventListener("mousedown", handleClickOutside);
+    return () =>
+      document.removeEventListener("mousedown", handleClickOutside);
   }, []);
 
+  const handleChange = (e) => {
+    setUser({ ...user, [e.target.name]: e.target.value });
+  };
+
   return (
-    <header
-      style={{
-        height: "64px",
-        backgroundColor: darkMode ? "#020617" : "#ffffff",
-        color: darkMode ? "#f8fafc" : "#020617",
-        display: "flex",
-        alignItems: "center",
-        justifyContent: "space-between",
-        padding: "0 24px",
-        borderBottom: darkMode
-          ? "1px solid #1e293b"
-          : "1px solid #e5e7eb",
-      }}
-    >
-      {/* LEFT */}
-      <div style={{ fontSize: "18px", fontWeight: "600" }}>
-        Software Metrics Dashboard
-      </div>
-
-      {/* CENTER */}
-      <input
-        type="text"
-        placeholder="Search metrics..."
-        style={{
-          width: "220px",
-          padding: "6px 10px",
-          borderRadius: "6px",
-          border: darkMode ? "1px solid #334155" : "1px solid #cbd5e1",
-          backgroundColor: darkMode ? "#020617" : "#ffffff",
-          color: darkMode ? "#f8fafc" : "#020617",
-          outline: "none",
-        }}
-      />
-
-      {/* RIGHT */}
-      <div style={{ display: "flex", alignItems: "center", gap: "16px" }}>
-        <span style={{ fontSize: "13px", opacity: 0.85 }}>
-          📦 Repo: <strong>Not Selected</strong>
-        </span>
-
-        {/* Theme Toggle */}
-        <button
-          onClick={toggleTheme}
-          style={{
-            background: "transparent",
-            border: darkMode ? "1px solid #334155" : "1px solid #cbd5e1",
-            padding: "6px 10px",
-            borderRadius: "6px",
-            cursor: "pointer",
-            color: darkMode ? "#f8fafc" : "#020617",
-          }}
-        >
-          {darkMode ? "☀ Light" : "🌙 Dark"}
-        </button>
-
-        {/* PROFILE */}
-        <div style={{ position: "relative" }} ref={dropdownRef}>
-          <img
-            src="https://i.pravatar.cc/40"
-            alt="profile"
-            onClick={() => setOpen(!open)}
-            style={{
-              width: "36px",
-              height: "36px",
-              borderRadius: "50%",
-              cursor: "pointer",
-              border: darkMode
-                ? "2px solid #38bdf8"
-                : "2px solid #2563eb",
-            }}
-          />
-
-          {open && (
-            <div
-              style={{
-                position: "absolute",
-                right: 0,
-                top: "46px",
-                width: "220px",
-                backgroundColor: darkMode ? "#020617" : "#ffffff",
-                border: darkMode
-                  ? "1px solid #1e293b"
-                  : "1px solid #e5e7eb",
-                borderRadius: "12px",
-                boxShadow: darkMode
-                  ? "0 10px 30px rgba(0,0,0,0.6)"
-                  : "0 10px 20px rgba(0,0,0,0.15)",
-                overflow: "hidden",
-                zIndex: 100,
-              }}
-            >
-              {/* USER INFO */}
-              <div
-                style={{
-                  padding: "14px",
-                  borderBottom: darkMode
-                    ? "1px solid #1e293b"
-                    : "1px solid #e5e7eb",
-                }}
-              >
-                <div style={{ fontWeight: "600", fontSize: "14px" }}>
-                  {user.name}
-                </div>
-                <div
-                  style={{
-                    fontSize: "12px",
-                    opacity: 0.8,
-                    marginTop: "2px",
-                  }}
-                >
-                  {user.email}
-                </div>
-              </div>
-
-              {/* ACTIONS */}
-              <DropdownItem label="✏️ Edit Profile" />
-              <Divider darkMode={darkMode} />
-              <DropdownItem label="🚪 Logout" danger />
-            </div>
-          )}
+    <>
+      {/* NAVBAR */}
+      <header style={navbarStyle(darkMode)}>
+        <div style={{ fontSize: "18px", fontWeight: "600" }}>
+          Software Metrics Dashboard
         </div>
-      </div>
-    </header>
+
+        <input placeholder="Search metrics..." style={inputStyle(darkMode)} />
+
+        <div style={{ display: "flex", alignItems: "center", gap: "16px" }}>
+          <span style={{ fontSize: "13px" }}>
+            📦 Repo: <strong>Not Selected</strong>
+          </span>
+
+          <button onClick={toggleTheme} style={themeBtn(darkMode)}>
+            {darkMode ? "☀ Light" : "🌙 Dark"}
+          </button>
+
+          <div style={{ position: "relative" }} ref={dropdownRef}>
+            <img
+              src="https://i.pravatar.cc/40"
+              alt="profile"
+              onClick={() => setOpen(!open)}
+              style={avatarStyle(darkMode)}
+            />
+
+            {open && (
+              <div style={dropdownStyle(darkMode)}>
+                <div style={userInfoStyle(darkMode)}>
+                  <strong>{user.name}</strong>
+                  <div style={{ fontSize: "12px", opacity: 0.8 }}>
+                    {user.email}
+                  </div>
+                </div>
+
+                <DropdownItem
+                  label="✏️ Edit Profile"
+                  onClick={() => {
+                    setShowModal(true);
+                    setOpen(false);
+                  }}
+                />
+                <Divider darkMode={darkMode} />
+                <DropdownItem label="🚪 Logout" danger />
+              </div>
+            )}
+          </div>
+        </div>
+      </header>
+
+      {/* EDIT PROFILE MODAL */}
+      {showModal && (
+        <div style={overlayStyle}>
+          <div style={modalStyle(darkMode)}>
+            <h3 style={{ marginBottom: "12px" }}>Edit Profile</h3>
+
+            <Label>Full Name</Label>
+            <input name="name" value={user.name} onChange={handleChange} style={modalInput(darkMode)} />
+
+            <Label>Username</Label>
+            <input name="username" value={user.username} onChange={handleChange} style={modalInput(darkMode)} />
+
+            <Label>Email</Label>
+            <input name="email" value={user.email} onChange={handleChange} style={modalInput(darkMode)} />
+
+            <Label>Phone</Label>
+            <input name="phone" value={user.phone} onChange={handleChange} style={modalInput(darkMode)} />
+
+            <hr style={{ margin: "12px 0" }} />
+
+            <Label>Current Password</Label>
+            <input
+              type="password"
+              name="currentPassword"
+              value={user.currentPassword}
+              onChange={handleChange}
+              placeholder="Enter current password"
+              style={modalInput(darkMode)}
+            />
+
+            <Label>New Password</Label>
+            <input
+              type="password"
+              name="newPassword"
+              value={user.newPassword}
+              onChange={handleChange}
+              placeholder="Enter new password"
+              style={modalInput(darkMode)}
+            />
+
+            <Label>Confirm New Password</Label>
+            <input
+              type="password"
+              name="confirmPassword"
+              value={user.confirmPassword}
+              onChange={handleChange}
+              placeholder="Confirm new password"
+              style={modalInput(darkMode)}
+            />
+
+            <div style={{ display: "flex", justifyContent: "flex-end", gap: "12px" }}>
+              <button onClick={() => setShowModal(false)} style={cancelBtn}>
+                Cancel
+              </button>
+              <button onClick={() => setShowModal(false)} style={saveBtn}>
+                Save Changes
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+    </>
   );
 }
 
-/* -------- Helpers -------- */
+/* ---------- STYLES ---------- */
 
-function DropdownItem({ label, danger }) {
+const navbarStyle = (dark) => ({
+  height: "64px",
+  backgroundColor: dark ? "#020617" : "#ffffff",
+  color: dark ? "#f8fafc" : "#020617",
+  display: "flex",
+  alignItems: "center",
+  justifyContent: "space-between",
+  padding: "0 24px",
+  borderBottom: dark ? "1px solid #1e293b" : "1px solid #e5e7eb",
+});
+
+const Label = ({ children }) => (
+  <label style={{ fontSize: "13px", marginTop: "8px", display: "block" }}>
+    {children}
+  </label>
+);
+
+const inputStyle = (dark) => ({
+  width: "220px",
+  padding: "6px 10px",
+  borderRadius: "6px",
+  border: dark ? "1px solid #334155" : "1px solid #cbd5e1",
+  backgroundColor: dark ? "#020617" : "#ffffff",
+  color: dark ? "#f8fafc" : "#020617",
+});
+
+const themeBtn = (dark) => ({
+  padding: "6px 10px",
+  borderRadius: "6px",
+  border: dark ? "1px solid #334155" : "1px solid #cbd5e1",
+  background: "transparent",
+  cursor: "pointer",
+});
+
+const avatarStyle = (dark) => ({
+  width: "36px",
+  height: "36px",
+  borderRadius: "50%",
+  cursor: "pointer",
+  border: dark ? "2px solid #38bdf8" : "2px solid #2563eb",
+});
+
+const dropdownStyle = (dark) => ({
+  position: "absolute",
+  right: 0,
+  top: "46px",
+  width: "220px",
+  backgroundColor: dark ? "#020617" : "#ffffff",
+  border: dark ? "1px solid #1e293b" : "1px solid #e5e7eb",
+  borderRadius: "12px",
+});
+
+const userInfoStyle = (dark) => ({
+  padding: "14px",
+  borderBottom: dark ? "1px solid #1e293b" : "1px solid #e5e7eb",
+});
+
+const overlayStyle = {
+  position: "fixed",
+  inset: 0,
+  backgroundColor: "rgba(0,0,0,0.5)",
+  display: "flex",
+  justifyContent: "center",
+  alignItems: "center",
+};
+
+const modalStyle = (dark) => ({
+  width: "420px",
+  backgroundColor: dark ? "#020617" : "#ffffff",
+  padding: "24px",
+  borderRadius: "14px",
+});
+
+const modalInput = (dark) => ({
+  width: "100%",
+  padding: "8px",
+  marginBottom: "4px",
+  borderRadius: "6px",
+  border: dark ? "1px solid #334155" : "1px solid #cbd5e1",
+  backgroundColor: dark ? "#020617" : "#ffffff",
+  color: dark ? "#f8fafc" : "#020617",
+});
+
+const cancelBtn = {
+  padding: "8px 14px",
+  borderRadius: "6px",
+  border: "1px solid #cbd5e1",
+};
+
+const saveBtn = {
+  padding: "8px 14px",
+  borderRadius: "6px",
+  border: "none",
+  background: "#2563eb",
+  color: "white",
+};
+
+function DropdownItem({ label, danger, onClick }) {
   return (
     <div
+      onClick={onClick}
       style={{
         padding: "10px 14px",
-        fontSize: "14px",
         cursor: "pointer",
         color: danger ? "#ef4444" : "inherit",
-        transition: "background 0.2s",
       }}
-      onMouseEnter={(e) =>
-        (e.currentTarget.style.background = "rgba(0,0,0,0.05)")
-      }
-      onMouseLeave={(e) =>
-        (e.currentTarget.style.background = "transparent")
-      }
     >
       {label}
     </div>
