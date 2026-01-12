@@ -1,10 +1,12 @@
 import React from "react";
 import Navbar from "../components/common/Navbar";
 import { useTheme } from "../context/ThemeContext";
+
 import MetricCard from "../components/cards/MetricCard";
 import TestCoverageLineChart from "../components/charts/TestCoverageLineChart";
 import CommitsBarChart from "../components/charts/CommitsBarChart";
 import BugSeverityPieChart from "../components/charts/BugSeverityPieChart";
+
 import { DASHBOARD_KPI_DATA } from "../utils/constants";
 
 function Dashboard() {
@@ -13,7 +15,7 @@ function Dashboard() {
   const pageBg = darkMode ? "#020617" : "#f1f5f9";
   const textColor = darkMode ? "#f8fafc" : "#020617";
 
-  const chartCardStyle = {
+  const cardStyle = {
     backgroundColor: darkMode ? "#020617" : "#ffffff",
     border: darkMode ? "1px solid #1e293b" : "1px solid #e5e7eb",
     borderRadius: "14px",
@@ -24,11 +26,25 @@ function Dashboard() {
   };
 
   return (
-    <div style={{ minHeight: "100vh", backgroundColor: pageBg }}>
+    <div
+      style={{
+        minHeight: "100vh",
+        paddingTop: "64px", // navbar height
+        backgroundColor: pageBg,
+      }}
+    >
+      {/* NAVBAR */}
       <Navbar />
 
-      <div style={{ maxWidth: "1200px", margin: "0 auto", padding: "32px" }}>
-        {/* PAGE TITLE */}
+      {/* CONTENT */}
+      <div
+        style={{
+          maxWidth: "1200px",
+          margin: "0 auto",
+          padding: "32px",
+        }}
+      >
+        {/* TITLE */}
         <h1
           style={{
             fontSize: "28px",
@@ -64,17 +80,27 @@ function Dashboard() {
               gap: "24px",
             }}
           >
-            {/* Test Coverage */}
-            <div style={chartCardStyle}>
-              <h3 style={{ marginBottom: "12px", color: textColor }}>
+            {/* TEST COVERAGE */}
+            <div style={cardStyle}>
+              <h3
+                style={{
+                  marginBottom: "12px",
+                  color: textColor,
+                }}
+              >
                 Test Coverage
               </h3>
               <TestCoverageLineChart />
             </div>
 
-            {/* Commits */}
-            <div style={chartCardStyle}>
-              <h3 style={{ marginBottom: "12px", color: textColor }}>
+            {/* COMMITS */}
+            <div style={cardStyle}>
+              <h3
+                style={{
+                  marginBottom: "12px",
+                  color: textColor,
+                }}
+              >
                 Commits
               </h3>
               <CommitsBarChart />
@@ -84,13 +110,30 @@ function Dashboard() {
 
         {/* BUG SEVERITY */}
         <section>
-          <div style={{ ...chartCardStyle, width: "fit-content" }}>
-            <h3 style={{ marginBottom: "12px", color: textColor }}>
-              Bug Severity
-            </h3>
-            <BugSeverityPieChart />
-          </div>
-        </section>
+  <div
+    style={{
+      ...cardStyle,
+      width: "100%",
+      maxWidth: "420px",
+      height: "360px",
+      display: "flex",
+      flexDirection: "column",
+      justifyContent: "center",
+    }}
+  >
+    <h3
+      style={{
+        marginBottom: "12px",
+        color: textColor,
+      }}
+    >
+      Bug Severity
+    </h3>
+
+    <BugSeverityPieChart />
+  </div>
+</section>
+
       </div>
     </div>
   );

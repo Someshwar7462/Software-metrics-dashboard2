@@ -28,14 +28,31 @@ function Navbar() {
       document.removeEventListener("mousedown", handleClickOutside);
   }, []);
 
-  const handleChange = (e) => {
+  const handleChange = (e) =>
     setUser({ ...user, [e.target.name]: e.target.value });
-  };
 
   return (
     <>
       {/* NAVBAR */}
-      <header style={navbarStyle(darkMode)}>
+      <header
+        style={{
+          position: "fixed",
+          top: 0,
+          left: 0,
+          right: 0,
+          height: "64px",
+          zIndex: 9999,
+          backgroundColor: darkMode ? "#020617" : "#ffffff",
+          color: darkMode ? "#f8fafc" : "#020617",
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "space-between",
+          padding: "0 24px",
+          borderBottom: darkMode
+            ? "1px solid #1e293b"
+            : "1px solid #e5e7eb",
+        }}
+      >
         <div style={{ fontSize: "18px", fontWeight: "600" }}>
           Software Metrics Dashboard
         </div>
@@ -51,6 +68,7 @@ function Navbar() {
             {darkMode ? "☀ Light" : "🌙 Dark"}
           </button>
 
+          {/* PROFILE */}
           <div style={{ position: "relative" }} ref={dropdownRef}>
             <img
               src="https://i.pravatar.cc/40"
@@ -87,21 +105,56 @@ function Navbar() {
       {showModal && (
         <div style={overlayStyle}>
           <div style={modalStyle(darkMode)}>
-            <h3 style={{ marginBottom: "12px" }}>Edit Profile</h3>
+            <h3
+              style={{
+                marginBottom: "12px",
+                color: darkMode ? "#f8fafc" : "#020617",
+              }}
+            >
+              Edit Profile
+            </h3>
 
             <Label>Full Name</Label>
-            <input name="name" value={user.name} onChange={handleChange} style={modalInput(darkMode)} />
+            <input
+              name="name"
+              value={user.name}
+              onChange={handleChange}
+              style={modalInput(darkMode)}
+            />
 
             <Label>Username</Label>
-            <input name="username" value={user.username} onChange={handleChange} style={modalInput(darkMode)} />
+            <input
+              name="username"
+              value={user.username}
+              onChange={handleChange}
+              style={modalInput(darkMode)}
+            />
 
             <Label>Email</Label>
-            <input name="email" value={user.email} onChange={handleChange} style={modalInput(darkMode)} />
+            <input
+              name="email"
+              value={user.email}
+              onChange={handleChange}
+              style={modalInput(darkMode)}
+            />
 
             <Label>Phone</Label>
-            <input name="phone" value={user.phone} onChange={handleChange} style={modalInput(darkMode)} />
+            <input
+              name="phone"
+              value={user.phone}
+              onChange={handleChange}
+              style={modalInput(darkMode)}
+            />
 
-            <hr style={{ margin: "12px 0" }} />
+            <hr
+              style={{
+                margin: "12px 0",
+                border: "none",
+                borderTop: darkMode
+                  ? "1px solid #334155"
+                  : "1px solid #e5e7eb",
+              }}
+            />
 
             <Label>Current Password</Label>
             <input
@@ -109,7 +162,6 @@ function Navbar() {
               name="currentPassword"
               value={user.currentPassword}
               onChange={handleChange}
-              placeholder="Enter current password"
               style={modalInput(darkMode)}
             />
 
@@ -119,21 +171,26 @@ function Navbar() {
               name="newPassword"
               value={user.newPassword}
               onChange={handleChange}
-              placeholder="Enter new password"
               style={modalInput(darkMode)}
             />
 
-            <Label>Confirm New Password</Label>
+            <Label>Confirm Password</Label>
             <input
               type="password"
               name="confirmPassword"
               value={user.confirmPassword}
               onChange={handleChange}
-              placeholder="Confirm new password"
               style={modalInput(darkMode)}
             />
 
-            <div style={{ display: "flex", justifyContent: "flex-end", gap: "12px" }}>
+            <div
+              style={{
+                display: "flex",
+                justifyContent: "flex-end",
+                gap: "12px",
+                marginTop: "12px",
+              }}
+            >
               <button onClick={() => setShowModal(false)} style={cancelBtn}>
                 Cancel
               </button>
@@ -150,22 +207,21 @@ function Navbar() {
 
 /* ---------- STYLES ---------- */
 
-const navbarStyle = (dark) => ({
-  height: "64px",
-  backgroundColor: dark ? "#020617" : "#ffffff",
-  color: dark ? "#f8fafc" : "#020617",
-  display: "flex",
-  alignItems: "center",
-  justifyContent: "space-between",
-  padding: "0 24px",
-  borderBottom: dark ? "1px solid #1e293b" : "1px solid #e5e7eb",
-});
-
-const Label = ({ children }) => (
-  <label style={{ fontSize: "13px", marginTop: "8px", display: "block" }}>
-    {children}
-  </label>
-);
+const Label = ({ children }) => {
+  const { darkMode } = useTheme();
+  return (
+    <label
+      style={{
+        fontSize: "13px",
+        marginTop: "8px",
+        display: "block",
+        color: darkMode ? "#cbd5f5" : "#334155",
+      }}
+    >
+      {children}
+    </label>
+  );
+};
 
 const inputStyle = (dark) => ({
   width: "220px",
@@ -182,6 +238,7 @@ const themeBtn = (dark) => ({
   border: dark ? "1px solid #334155" : "1px solid #cbd5e1",
   background: "transparent",
   cursor: "pointer",
+  color: dark ? "#f8fafc" : "#020617",
 });
 
 const avatarStyle = (dark) => ({
@@ -210,23 +267,26 @@ const userInfoStyle = (dark) => ({
 const overlayStyle = {
   position: "fixed",
   inset: 0,
-  backgroundColor: "rgba(0,0,0,0.5)",
+  backgroundColor: "rgba(0,0,0,0.6)",
   display: "flex",
   justifyContent: "center",
   alignItems: "center",
+  zIndex: 10000,
 };
 
 const modalStyle = (dark) => ({
   width: "420px",
   backgroundColor: dark ? "#020617" : "#ffffff",
+  color: dark ? "#f8fafc" : "#020617",
   padding: "24px",
   borderRadius: "14px",
+  marginTop: "64px",
 });
 
 const modalInput = (dark) => ({
   width: "100%",
   padding: "8px",
-  marginBottom: "4px",
+  marginBottom: "6px",
   borderRadius: "6px",
   border: dark ? "1px solid #334155" : "1px solid #cbd5e1",
   backgroundColor: dark ? "#020617" : "#ffffff",
