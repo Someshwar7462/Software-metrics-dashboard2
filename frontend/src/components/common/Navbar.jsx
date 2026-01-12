@@ -12,6 +12,7 @@ function Navbar() {
     username: "someshwar_01",
     email: "someshwar@gmail.com",
     phone: "9876543210",
+    profilePic: "https://i.pravatar.cc/100",
     currentPassword: "",
     newPassword: "",
     confirmPassword: "",
@@ -30,6 +31,14 @@ function Navbar() {
 
   const handleChange = (e) =>
     setUser({ ...user, [e.target.name]: e.target.value });
+
+  // ✅ Profile image upload (ONLY from Edit Profile)
+  const handleProfilePicUpload = (e) => {
+    const file = e.target.files[0];
+    if (!file) return;
+    const previewURL = URL.createObjectURL(file);
+    setUser({ ...user, profilePic: previewURL });
+  };
 
   return (
     <>
@@ -53,7 +62,7 @@ function Navbar() {
             : "1px solid #e5e7eb",
         }}
       >
-        <div style={{ fontSize: "18px", fontWeight: "600" }}>
+        <div style={{ fontSize: "18px", fontWeight: 600 }}>
           Software Metrics Dashboard
         </div>
 
@@ -68,10 +77,10 @@ function Navbar() {
             {darkMode ? "☀ Light" : "🌙 Dark"}
           </button>
 
-          {/* PROFILE */}
-          <div style={{ position: "relative" }} ref={dropdownRef}>
+          {/* PROFILE AVATAR (ONLY DROPDOWN) */}
+          <div ref={dropdownRef} style={{ position: "relative" }}>
             <img
-              src="https://i.pravatar.cc/40"
+              src={user.profilePic}
               alt="profile"
               onClick={() => setOpen(!open)}
               style={avatarStyle(darkMode)}
@@ -105,14 +114,42 @@ function Navbar() {
       {showModal && (
         <div style={overlayStyle}>
           <div style={modalStyle(darkMode)}>
-            <h3
-              style={{
-                marginBottom: "12px",
-                color: darkMode ? "#f8fafc" : "#020617",
-              }}
-            >
-              Edit Profile
-            </h3>
+            <h3 style={{ marginBottom: "12px" }}>Edit Profile</h3>
+
+            {/* PROFILE IMAGE + UPLOAD */}
+            <div style={{ textAlign: "center", marginBottom: "16px" }}>
+              <img
+                src={user.profilePic}
+                alt="profile"
+                style={{
+                  width: "80px",
+                  height: "80px",
+                  borderRadius: "50%",
+                  objectFit: "cover",
+                  border: darkMode
+                    ? "2px solid #38bdf8"
+                    : "2px solid #2563eb",
+                }}
+              />
+
+              <label
+                style={{
+                  display: "block",
+                  marginTop: "8px",
+                  fontSize: "13px",
+                  color: "#2563eb",
+                  cursor: "pointer",
+                }}
+              >
+                Change Profile Picture
+                <input
+                  type="file"
+                  accept="image/*"
+                  onChange={handleProfilePicUpload}
+                  style={{ display: "none" }}
+                />
+              </label>
+            </div>
 
             <Label>Full Name</Label>
             <input
