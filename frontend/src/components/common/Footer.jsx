@@ -4,6 +4,9 @@ import { useTheme } from "../../context/ThemeContext";
 function Footer() {
   const { darkMode } = useTheme();
 
+  const textPrimary = darkMode ? "#f8fafc" : "#020617";
+  const textSecondary = darkMode ? "#94a3b8" : "#64748b";
+
   return (
     <footer
       style={{
@@ -17,23 +20,22 @@ function Footer() {
         borderTop: darkMode
           ? "1px solid #1e293b"
           : "1px solid #e5e7eb",
-        color: darkMode ? "#cbd5e1" : "#475569",
         fontSize: "13px",
       }}
     >
       {/* LEFT */}
-      <div>
-        <strong style={{ color: darkMode ? "#f8fafc" : "#020617" }}>
+      <div style={{ color: textSecondary }}>
+        <strong style={{ color: textPrimary }}>
           Software Metrics Dashboard
         </strong>
         <span style={{ marginLeft: "6px" }}>
-          · Engineering quality at a glance
+          · Software quality & engineering insights
         </span>
       </div>
 
       {/* RIGHT */}
-      <div>
-        v1.0.0 · DEV · © {new Date().getFullYear()}
+      <div style={{ color: textSecondary }}>
+        Version 1.0.0 · DEV · © {new Date().getFullYear()}
       </div>
     </footer>
   );
