@@ -27,7 +27,7 @@ function Dashboard() {
       : "0 6px 16px rgba(0,0,0,0.08)",
   };
 
-  // dummy metrics (already used by ActionableInsights)
+  // 🔹 Dummy metrics data (unchanged)
   const metricsData = {
     criticalBugs: 4,
     majorBugs: 6,
@@ -36,20 +36,31 @@ function Dashboard() {
     commits: 148,
   };
 
+  // 🔹 Repository context (UPDATED – still dummy, safe)
+  const selectedRepo = {
+    owner: "someshwar",
+    name: "software-metrics-dashboard",
+    branch: "main",
+    visibility: "Public",
+    lastSynced: "2 hours ago",
+    language: "Java",
+    url: "https://github.com/someshwar/software-metrics-dashboard",
+  };
+
   return (
     <div
       style={{
         minHeight: "100vh",
         backgroundColor: pageBg,
-        paddingTop: "64px", // navbar height
+        paddingTop: "64px",
         display: "flex",
         flexDirection: "column",
       }}
     >
-      {/* NAVBAR (FULL WIDTH) */}
+      {/* NAVBAR */}
       <Navbar />
 
-      {/* MAIN CONTENT (CENTERED) */}
+      {/* MAIN CONTENT */}
       <div
         style={{
           maxWidth: "1200px",
@@ -64,12 +75,105 @@ function Dashboard() {
           style={{
             fontSize: "28px",
             fontWeight: "600",
-            marginBottom: "32px",
+            marginBottom: "16px",
             color: textColor,
           }}
         >
           Software Metrics Dashboard
         </h1>
+
+       {/* REPOSITORY CONTEXT */}
+<div
+  style={{
+    marginBottom: "36px",
+    padding: "22px 28px",
+    borderRadius: "16px",
+    backgroundColor: darkMode ? "#020617" : "#ffffff",
+    border: darkMode ? "1px solid #1e293b" : "1px solid #e5e7eb",
+    display: "grid",
+    gridTemplateColumns: "2.5fr 3.5fr 2fr",
+    gap: "28px",
+    alignItems: "center",
+  }}
+>
+  {/* LEFT: REPO NAME */}
+  <div>
+    <div
+      style={{
+        fontSize: "13px",
+        color: darkMode ? "#94a3b8" : "#64748b",
+        marginBottom: "6px",
+      }}
+    >
+      Repository Name
+    </div>
+
+    <div
+      style={{
+        fontSize: "20px",
+        fontWeight: "600",
+        color: darkMode ? "#f8fafc" : "#020617",
+      }}
+    >
+      {selectedRepo.name}
+    </div>
+  </div>
+
+  {/* CENTER: URL + BRANCH */}
+  <div>
+    <div
+      style={{
+        fontSize: "13px",
+        color: darkMode ? "#94a3b8" : "#64748b",
+        marginBottom: "6px",
+      }}
+    >
+      Repository URL
+    </div>
+
+    <a
+      href={selectedRepo.url}
+      target="_blank"
+      rel="noopener noreferrer"
+      style={{
+        fontSize: "14px",
+        color: darkMode ? "#38bdf8" : "#2563eb",
+        textDecoration: "none",
+        wordBreak: "break-all",
+        display: "block",
+        marginBottom: "6px",
+      }}
+    >
+      {selectedRepo.url}
+    </a>
+
+    <div
+      style={{
+        fontSize: "14px",
+        color: darkMode ? "#94a3b8" : "#64748b",
+      }}
+    >
+      Branch: <strong>{selectedRepo.branch}</strong>
+    </div>
+  </div>
+
+  {/* RIGHT: META */}
+  <div
+    style={{
+      display: "flex",
+      flexDirection: "column",
+      gap: "8px",
+      fontSize: "14px",
+      color: darkMode ? "#94a3b8" : "#64748b",
+    }}
+  >
+    <span>🔓 Visibility: {selectedRepo.visibility}</span>
+    <span>💻 Language: {selectedRepo.language}</span>
+    <span>⏱ Last synced: {selectedRepo.lastSynced}</span>
+  </div>
+</div>
+
+
 
         {/* KPI CARDS */}
         <section style={{ marginBottom: "48px" }}>
@@ -134,19 +238,14 @@ function Dashboard() {
               <BugSeverityPieChart />
             </div>
 
-            <div
-              style={{
-                ...cardStyle,
-                height: "360px",
-              }}
-            >
+            <div style={{ ...cardStyle, height: "360px" }}>
               <ActionableInsights metrics={metricsData} />
             </div>
           </div>
         </section>
       </div>
 
-      {/* FOOTER (FULL WIDTH – HEADER STYLE) */}
+      {/* FOOTER */}
       <Footer />
     </div>
   );
