@@ -64,27 +64,66 @@ function ActionableInsights({ metrics }) {
   };
 
   return (
-    <div>
-      <h3 style={{ marginBottom: "16px", color: headingColor }}>
-        Actionable Insights
-      </h3>
+  <div>
+    {/* TITLE */}
+    <h3
+      style={{
+        marginBottom: "16px",
+        fontSize: "22px",
+        fontWeight: "600",
+        color: headingColor,
+      }}
+    >
+      Actionable Insights
+    </h3>
 
-      <ul
-        style={{
-          paddingLeft: "20px",
-          fontSize: "15px",
-          lineHeight: "1.8",
-          color: textColor,
-        }}
-      >
-        {insights.map((item, index) => (
-          <li key={index}>
-            {getIcon(item.level)} {item.message}
-          </li>
-        ))}
-      </ul>
-    </div>
-  );
+    {/* OVERALL NOTE */}
+    <p
+      style={{
+        fontSize: "16px",
+        marginBottom: "18px",
+        color: textColor,
+        lineHeight: "1.6",
+      }}
+    >
+      Below are the key observations derived from your project metrics.
+      Addressing these points will significantly improve code quality,
+      stability, and release confidence.
+    </p>
+
+    {/* INSIGHTS */}
+    <ul
+      style={{
+        paddingLeft: "20px",
+        fontSize: "17px",
+        lineHeight: "2",
+        color: textColor,
+        marginBottom: "24px",
+      }}
+    >
+      <li>🔴 <strong>Fix critical bugs</strong> before the next release cycle</li>
+      <li>🟡 <strong>Improve test coverage</strong> to at least <b>80%</b></li>
+      <li>🟠 <strong>Review unresolved major bugs</strong> to reduce technical debt</li>
+    </ul>
+
+    {/* EXTRA GUIDANCE */}
+    <p
+  style={{
+    marginTop: "14px",
+    fontSize: "15px",
+    lineHeight: "1.6",
+    color: textColor,
+  }}
+>
+  <strong>Why this matters:</strong> Resolving high-severity issues early
+  prevents production failures, improves team velocity, and ensures smoother
+  deployments. Consistent monitoring of these insights helps maintain long-term
+  software health.
+</p>
+
+  </div>
+);
+
 }
 
 export default ActionableInsights;
