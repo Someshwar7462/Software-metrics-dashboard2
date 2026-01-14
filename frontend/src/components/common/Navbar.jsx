@@ -69,9 +69,9 @@ function Navbar() {
         {/* <input placeholder="Search metrics..." style={inputStyle(darkMode)} /> */}
 
         <div style={{ display: "flex", alignItems: "center", gap: "16px" }}>
-          <span style={{ fontSize: "13px" }}>
+          {/* <span style={{ fontSize: "13px" }}>
             📦 Repo: <strong>Not Selected</strong>
-          </span>
+          </span> */}
 
           <button onClick={toggleTheme} style={themeBtn(darkMode)}>
             {darkMode ? "☀ Light" : "🌙 Dark"}
