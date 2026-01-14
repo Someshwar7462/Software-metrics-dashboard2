@@ -24,9 +24,9 @@ function MetricCard({ title, value, color, icon, subtitle }) {
       }}
     >
       {/* Icon */}
-      <div style={{ fontSize: "32px", marginBottom: "10px" }}>
+      {/* <div style={{ fontSize: "32px", marginBottom: "10px" }}>
         {icon}
-      </div>
+      </div> */}
 
       {/* Title */}
       <p style={{ opacity: 0.9 }}>{title}</p>
