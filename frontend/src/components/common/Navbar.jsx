@@ -66,7 +66,7 @@ function Navbar() {
           Software Metrics Dashboard
         </div>
 
-        <input placeholder="Search metrics..." style={inputStyle(darkMode)} />
+        {/* <input placeholder="Search metrics..." style={inputStyle(darkMode)} /> */}
 
         <div style={{ display: "flex", alignItems: "center", gap: "16px" }}>
           <span style={{ fontSize: "13px" }}>
