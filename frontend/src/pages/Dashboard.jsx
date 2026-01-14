@@ -1,5 +1,7 @@
 import React from "react";
 import Navbar from "../components/common/Navbar";
+import ActionableInsights from "../components/Insights/ActionableInsights";
+
 import { useTheme } from "../context/ThemeContext";
 
 import MetricCard from "../components/cards/MetricCard";
@@ -109,30 +111,36 @@ function Dashboard() {
         </section>
 
         {/* BUG SEVERITY */}
-        <section>
+       {/* BUG SEVERITY + INSIGHTS */}
+<section>
   <div
     style={{
-      ...cardStyle,
-      width: "100%",
-      maxWidth: "420px",
-      height: "360px",
-      display: "flex",
-      flexDirection: "column",
-      justifyContent: "center",
+      display: "grid",
+      gridTemplateColumns: "420px 1fr",
+      gap: "24px",
     }}
   >
-    <h3
+    {/* LEFT: BUG SEVERITY (UNCHANGED) */}
+    <div
       style={{
-        marginBottom: "12px",
-        color: textColor,
+        ...cardStyle,
+        height: "360px",
+        display: "flex",
+        flexDirection: "column",
+        justifyContent: "center",
       }}
     >
-      Bug Severity
-    </h3>
+      <h3 style={{ marginBottom: "12px", color: textColor }}>
+        Bug Severity
+      </h3>
+      <BugSeverityPieChart />
+    </div>
 
-    <BugSeverityPieChart />
+    {/* RIGHT: ACTIONABLE INSIGHTS (NEW) */}
+    <ActionableInsights />
   </div>
 </section>
+
 
       </div>
     </div>
