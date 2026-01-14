@@ -1,5 +1,6 @@
 import React from "react";
 import Navbar from "../components/common/Navbar";
+import Footer from "../components/common/Footer";
 import { useTheme } from "../context/ThemeContext";
 
 import MetricCard from "../components/cards/MetricCard";
@@ -12,15 +13,6 @@ import { DASHBOARD_KPI_DATA } from "../utils/constants";
 
 function Dashboard() {
   const { darkMode } = useTheme();
-  // 🔹 Dummy metrics data (future me backend se aayega)
-const metricsData = {
-  criticalBugs: 4,
-  majorBugs: 6,
-  testCoverage: 75,
-  buildStatus: "PASS",
-  commits: 148,
-};
-
 
   const pageBg = darkMode ? "#020617" : "#f1f5f9";
   const textColor = darkMode ? "#f8fafc" : "#020617";
@@ -35,23 +27,36 @@ const metricsData = {
       : "0 6px 16px rgba(0,0,0,0.08)",
   };
 
+  // dummy metrics (already used by ActionableInsights)
+  const metricsData = {
+    criticalBugs: 4,
+    majorBugs: 6,
+    testCoverage: 75,
+    buildStatus: "PASS",
+    commits: 148,
+  };
+
   return (
     <div
       style={{
         minHeight: "100vh",
-        paddingTop: "64px",
         backgroundColor: pageBg,
+        paddingTop: "64px", // navbar height
+        display: "flex",
+        flexDirection: "column",
       }}
     >
-      {/* NAVBAR */}
+      {/* NAVBAR (FULL WIDTH) */}
       <Navbar />
 
-      {/* CONTENT */}
+      {/* MAIN CONTENT (CENTERED) */}
       <div
         style={{
           maxWidth: "1200px",
           margin: "0 auto",
           padding: "32px",
+          width: "100%",
+          flex: 1,
         }}
       >
         {/* TITLE */}
@@ -90,7 +95,6 @@ const metricsData = {
               gap: "24px",
             }}
           >
-            {/* TEST COVERAGE */}
             <div style={cardStyle}>
               <h3 style={{ marginBottom: "12px", color: textColor }}>
                 Test Coverage
@@ -98,7 +102,6 @@ const metricsData = {
               <TestCoverageLineChart />
             </div>
 
-            {/* COMMITS */}
             <div style={cardStyle}>
               <h3 style={{ marginBottom: "12px", color: textColor }}>
                 Commits
@@ -108,7 +111,7 @@ const metricsData = {
           </div>
         </section>
 
-        {/* BUG SEVERITY + ACTIONABLE INSIGHTS */}
+        {/* BUG SEVERITY + INSIGHTS */}
         <section>
           <div
             style={{
@@ -117,7 +120,6 @@ const metricsData = {
               gap: "24px",
             }}
           >
-            {/* BUG SEVERITY */}
             <div
               style={{
                 ...cardStyle,
@@ -132,14 +134,10 @@ const metricsData = {
               <BugSeverityPieChart />
             </div>
 
-            {/* ACTIONABLE INSIGHTS */}
             <div
               style={{
                 ...cardStyle,
-                height: "360px", // ✅ SAME HEIGHT (FIX)
-                display: "flex",
-                flexDirection: "column",
-                justifyContent: "space-between",
+                height: "360px",
               }}
             >
               <ActionableInsights metrics={metricsData} />
@@ -147,6 +145,9 @@ const metricsData = {
           </div>
         </section>
       </div>
+
+      {/* FOOTER (FULL WIDTH – HEADER STYLE) */}
+      <Footer />
     </div>
   );
 }
