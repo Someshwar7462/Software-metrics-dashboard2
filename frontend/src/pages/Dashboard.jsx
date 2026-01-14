@@ -12,6 +12,15 @@ import { DASHBOARD_KPI_DATA } from "../utils/constants";
 
 function Dashboard() {
   const { darkMode } = useTheme();
+  // 🔹 Dummy metrics data (future me backend se aayega)
+const metricsData = {
+  criticalBugs: 4,
+  majorBugs: 6,
+  testCoverage: 75,
+  buildStatus: "PASS",
+  commits: 148,
+};
+
 
   const pageBg = darkMode ? "#020617" : "#f1f5f9";
   const textColor = darkMode ? "#f8fafc" : "#020617";
@@ -133,7 +142,7 @@ function Dashboard() {
                 justifyContent: "space-between",
               }}
             >
-              <ActionableInsights />
+              <ActionableInsights metrics={metricsData} />
             </div>
           </div>
         </section>
