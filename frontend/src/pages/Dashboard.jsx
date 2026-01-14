@@ -1,13 +1,12 @@
 import React from "react";
 import Navbar from "../components/common/Navbar";
-import ActionableInsights from "../components/Insights/ActionableInsights";
-
 import { useTheme } from "../context/ThemeContext";
 
 import MetricCard from "../components/cards/MetricCard";
 import TestCoverageLineChart from "../components/charts/TestCoverageLineChart";
 import CommitsBarChart from "../components/charts/CommitsBarChart";
 import BugSeverityPieChart from "../components/charts/BugSeverityPieChart";
+import ActionableInsights from "../components/insights/ActionableInsights";
 
 import { DASHBOARD_KPI_DATA } from "../utils/constants";
 
@@ -31,7 +30,7 @@ function Dashboard() {
     <div
       style={{
         minHeight: "100vh",
-        paddingTop: "64px", // navbar height
+        paddingTop: "64px",
         backgroundColor: pageBg,
       }}
     >
@@ -84,12 +83,7 @@ function Dashboard() {
           >
             {/* TEST COVERAGE */}
             <div style={cardStyle}>
-              <h3
-                style={{
-                  marginBottom: "12px",
-                  color: textColor,
-                }}
-              >
+              <h3 style={{ marginBottom: "12px", color: textColor }}>
                 Test Coverage
               </h3>
               <TestCoverageLineChart />
@@ -97,12 +91,7 @@ function Dashboard() {
 
             {/* COMMITS */}
             <div style={cardStyle}>
-              <h3
-                style={{
-                  marginBottom: "12px",
-                  color: textColor,
-                }}
-              >
+              <h3 style={{ marginBottom: "12px", color: textColor }}>
                 Commits
               </h3>
               <CommitsBarChart />
@@ -110,38 +99,44 @@ function Dashboard() {
           </div>
         </section>
 
-        {/* BUG SEVERITY */}
-       {/* BUG SEVERITY + INSIGHTS */}
-<section>
-  <div
-    style={{
-      display: "grid",
-      gridTemplateColumns: "420px 1fr",
-      gap: "24px",
-    }}
-  >
-    {/* LEFT: BUG SEVERITY (UNCHANGED) */}
-    <div
-      style={{
-        ...cardStyle,
-        height: "360px",
-        display: "flex",
-        flexDirection: "column",
-        justifyContent: "center",
-      }}
-    >
-      <h3 style={{ marginBottom: "12px", color: textColor }}>
-        Bug Severity
-      </h3>
-      <BugSeverityPieChart />
-    </div>
+        {/* BUG SEVERITY + ACTIONABLE INSIGHTS */}
+        <section>
+          <div
+            style={{
+              display: "grid",
+              gridTemplateColumns: "1fr 1fr",
+              gap: "24px",
+            }}
+          >
+            {/* BUG SEVERITY */}
+            <div
+              style={{
+                ...cardStyle,
+                height: "360px",
+                display: "flex",
+                flexDirection: "column",
+              }}
+            >
+              <h3 style={{ marginBottom: "12px", color: textColor }}>
+                Bug Severity
+              </h3>
+              <BugSeverityPieChart />
+            </div>
 
-    {/* RIGHT: ACTIONABLE INSIGHTS (NEW) */}
-    <ActionableInsights />
-  </div>
-</section>
-
-
+            {/* ACTIONABLE INSIGHTS */}
+            <div
+              style={{
+                ...cardStyle,
+                height: "360px", // ✅ SAME HEIGHT (FIX)
+                display: "flex",
+                flexDirection: "column",
+                justifyContent: "space-between",
+              }}
+            >
+              <ActionableInsights />
+            </div>
+          </div>
+        </section>
       </div>
     </div>
   );
