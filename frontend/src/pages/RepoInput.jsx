@@ -2,21 +2,14 @@ import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useTheme } from "../context/ThemeContext";
 
-/* 🔹 Helper: GitHub URL se repo info nikalna */
-function extractRepoInfo(repoUrl) {
+/* 🔹 Helper: owner & repo extract */
+function extractOwnerRepo(repoUrl) {
   const cleanUrl = repoUrl.replace(".git", "");
   const parts = cleanUrl.split("github.com/")[1]?.split("/") || [];
-
   return {
-    owner: parts[0] || "unknown",
-    name: parts[1] || "unknown-repo",
-    branch: "main",
-    visibility: "Public",
-    language: parts[1]?.toLowerCase().includes("java")
-      ? "Java"
-      : "JavaScript",
-    lastSynced: "Just now",
-    url: cleanUrl,
+    owner: parts[0],
+    repo: parts[1],
+    cleanUrl,
   };
 }
 
@@ -26,33 +19,68 @@ function RepoInput() {
 
   const [repoUrl, setRepoUrl] = useState("");
   const [error, setError] = useState("");
+  const [loading, setLoading] = useState(false);
 
-  const handleAnalyze = () => {
-    if (!repoUrl.trim()) {
+  const handleAnalyze = async () => {
+    if (!repoUrl.includes("github.com")) {
       setError("Please enter a valid GitHub repository URL");
       return;
     }
 
-    // 🔹 Step 1: Repo info GitHub URL se
-    const repoInfo = extractRepoInfo(repoUrl);
+    try {
+      setLoading(true);
+      setError("");
 
-    // 🔹 Step 1: Dummy metrics (abhi zero, next steps me fill honge)
-    const repoData = {
-      repoInfo,
-      metrics: {
-        criticalBugs: 0,
-        majorBugs: 0,
-        testCoverage: 0,
-        buildStatus: "N/A",
-        commits: 0,
-      },
-    };
+      const { owner, repo, cleanUrl } = extractOwnerRepo(repoUrl);
 
-    // 🔹 Save to localStorage
-    localStorage.setItem("selectedRepo", JSON.stringify(repoData));
+      if (!owner || !repo) {
+        setError("Invalid GitHub repository format");
+        setLoading(false);
+        return;
+      }
 
-    // 🔹 Go to dashboard
-    navigate("/dashboard");
+      /* 🔹 GitHub Public API call (NO BACKEND) */
+      const res = await fetch(
+        `https://api.github.com/repos/${owner}/${repo}`
+      );
+
+      if (!res.ok) {
+        throw new Error("Repository not found or API limit reached");
+      }
+
+      const data = await res.json();
+
+      /* 🔹 Repo info (NOW REAL & DYNAMIC) */
+      const repoInfo = {
+        owner,
+        name: data.name,
+        url: cleanUrl,
+        branch: data.default_branch,
+        visibility: data.private ? "Private" : "Public",
+        language: data.language || "Unknown",
+        lastSynced: new Date(data.updated_at).toLocaleString(),
+      };
+
+      /* 🔹 Dummy metrics (next steps me improve karenge) */
+      const repoData = {
+        repoInfo,
+        metrics: {
+          criticalBugs: Math.floor(Math.random() * 5) + 1,
+          majorBugs: Math.floor(Math.random() * 8) + 2,
+          testCoverage: Math.floor(Math.random() * 30) + 60,
+          buildStatus: Math.random() > 0.3 ? "PASS" : "FAIL",
+          commits: data.size ? Math.floor(data.size / 10) : 120,
+        },
+      };
+
+      localStorage.setItem("selectedRepo", JSON.stringify(repoData));
+
+      navigate("/dashboard");
+    } catch (err) {
+      setError(err.message || "Something went wrong");
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
@@ -84,19 +112,9 @@ function RepoInput() {
           Analyze GitHub Repository
         </h2>
 
-        <p
-          style={{
-            fontSize: "14px",
-            marginBottom: "16px",
-            color: darkMode ? "#94a3b8" : "#64748b",
-          }}
-        >
-          Paste a public GitHub repository URL to analyze project metrics.
-        </p>
-
         <input
           type="text"
-          placeholder="https://github.com/username/repo"
+          placeholder="https://github.com/owner/repo"
           value={repoUrl}
           onChange={(e) => {
             setRepoUrl(e.target.value);
@@ -114,31 +132,26 @@ function RepoInput() {
         />
 
         {error && (
-          <div
-            style={{
-              color: "#ef4444",
-              fontSize: "13px",
-              marginBottom: "10px",
-            }}
-          >
+          <div style={{ color: "#ef4444", fontSize: "13px", marginBottom: "10px" }}>
             {error}
           </div>
         )}
 
         <button
           onClick={handleAnalyze}
+          disabled={loading}
           style={{
             width: "100%",
             padding: "10px",
             borderRadius: "8px",
             border: "none",
             cursor: "pointer",
-            backgroundColor: "#2563eb",
+            backgroundColor: loading ? "#94a3b8" : "#2563eb",
             color: "white",
             fontWeight: "600",
           }}
         >
-          Analyze Repository
+          {loading ? "Analyzing..." : "Analyze Repository"}
         </button>
       </div>
     </div>
