@@ -2,6 +2,24 @@ import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useTheme } from "../context/ThemeContext";
 
+/* 🔹 Helper: GitHub URL se repo info nikalna */
+function extractRepoInfo(repoUrl) {
+  const cleanUrl = repoUrl.replace(".git", "");
+  const parts = cleanUrl.split("github.com/")[1]?.split("/") || [];
+
+  return {
+    owner: parts[0] || "unknown",
+    name: parts[1] || "unknown-repo",
+    branch: "main",
+    visibility: "Public",
+    language: parts[1]?.toLowerCase().includes("java")
+      ? "Java"
+      : "JavaScript",
+    lastSynced: "Just now",
+    url: cleanUrl,
+  };
+}
+
 function RepoInput() {
   const { darkMode } = useTheme();
   const navigate = useNavigate();
@@ -15,34 +33,25 @@ function RepoInput() {
       return;
     }
 
-    // 🔹 Extract repo name safely
-    const parts = repoUrl.replace(".git", "").split("/");
-    const repoName = parts[parts.length - 1] || "unknown-repo";
+    // 🔹 Step 1: Repo info GitHub URL se
+    const repoInfo = extractRepoInfo(repoUrl);
 
-    // 🔹 Dummy repo-based data (Step 1 – local only)
+    // 🔹 Step 1: Dummy metrics (abhi zero, next steps me fill honge)
     const repoData = {
-      repoInfo: {
-        name: repoName,
-        url: repoUrl,
-        branch: "main",
-        visibility: "Public",
-        language: "JavaScript",
-        lastSynced: "Just now",
-      },
-
+      repoInfo,
       metrics: {
-        criticalBugs: Math.floor(Math.random() * 5) + 1,
-        majorBugs: Math.floor(Math.random() * 10) + 3,
-        testCoverage: Math.floor(Math.random() * 30) + 60,
-        buildStatus: Math.random() > 0.3 ? "PASS" : "FAIL",
-        commits: Math.floor(Math.random() * 300) + 50,
+        criticalBugs: 0,
+        majorBugs: 0,
+        testCoverage: 0,
+        buildStatus: "N/A",
+        commits: 0,
       },
     };
 
     // 🔹 Save to localStorage
     localStorage.setItem("selectedRepo", JSON.stringify(repoData));
 
-    // 🔹 Navigate to dashboard
+    // 🔹 Go to dashboard
     navigate("/dashboard");
   };
 
@@ -105,7 +114,13 @@ function RepoInput() {
         />
 
         {error && (
-          <div style={{ color: "#ef4444", fontSize: "13px", marginBottom: "10px" }}>
+          <div
+            style={{
+              color: "#ef4444",
+              fontSize: "13px",
+              marginBottom: "10px",
+            }}
+          >
             {error}
           </div>
         )}
