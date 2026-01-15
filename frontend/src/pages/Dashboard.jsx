@@ -9,8 +9,6 @@ import CommitsBarChart from "../components/charts/CommitsBarChart";
 import BugSeverityPieChart from "../components/charts/BugSeverityPieChart";
 import ActionableInsights from "../components/insights/ActionableInsights";
 
-import { DASHBOARD_KPI_DATA } from "../utils/constants";
-
 function Dashboard() {
   const { darkMode } = useTheme();
 
@@ -29,9 +27,9 @@ function Dashboard() {
 
   /* ================= SAFE LOCAL STORAGE READ ================= */
 
-  const storedData = JSON.parse(localStorage.getItem("selectedRepo"));
+  const storedData = JSON.parse(localStorage.getItem("selectedRepo")) || {};
 
-  const selectedRepo = storedData?.repoInfo || {
+  const selectedRepo = storedData.repoInfo || {
     name: "No repository selected",
     url: "",
     branch: "-",
@@ -40,13 +38,42 @@ function Dashboard() {
     lastSynced: "-",
   };
 
-  const metricsData = storedData?.metrics || {
+  const metricsData = storedData.metrics || {
     criticalBugs: 0,
     majorBugs: 0,
     testCoverage: 0,
     buildStatus: "N/A",
     commits: 0,
   };
+
+  /* ================= KPI DATA (NOW DYNAMIC) ================= */
+
+  const DASHBOARD_KPI_DATA = [
+    {
+      title: "Critical Bugs",
+      value: metricsData.criticalBugs,
+      subtitle: "High priority issues",
+      color: "#dc2626",
+    },
+    {
+      title: "Major Bugs",
+      value: metricsData.majorBugs,
+      subtitle: "Needs attention",
+      color: "#f97316",
+    },
+    {
+      title: "Test Coverage",
+      value: `${metricsData.testCoverage}%`,
+      subtitle: "Code covered by tests",
+      color: "#2563eb",
+    },
+    {
+      title: "Commits",
+      value: metricsData.commits,
+      subtitle: "Total commits",
+      color: "#16a34a",
+    },
+  ];
 
   /* =========================================================== */
 
@@ -60,10 +87,8 @@ function Dashboard() {
         flexDirection: "column",
       }}
     >
-      {/* NAVBAR */}
       <Navbar />
 
-      {/* MAIN CONTENT */}
       <div
         style={{
           maxWidth: "1200px",
@@ -99,80 +124,54 @@ function Dashboard() {
             alignItems: "center",
           }}
         >
-          {/* LEFT */}
           <div>
-            <div
-              style={{
-                fontSize: "13px",
-                color: darkMode ? "#94a3b8" : "#64748b",
-                marginBottom: "6px",
-              }}
-            >
+            <div style={{ fontSize: "13px", color: "#64748b" }}>
               Repository Name
             </div>
-
             <div
               style={{
                 fontSize: "20px",
                 fontWeight: "600",
-                color: darkMode ? "#f8fafc" : "#020617",
+                color: textColor,
               }}
             >
               {selectedRepo.name}
             </div>
           </div>
 
-          {/* CENTER */}
           <div>
-            <div
-              style={{
-                fontSize: "13px",
-                color: darkMode ? "#94a3b8" : "#64748b",
-                marginBottom: "6px",
-              }}
-            >
+            <div style={{ fontSize: "13px", color: "#64748b" }}>
               Repository URL
             </div>
-
             <a
               href={selectedRepo.url}
               target="_blank"
               rel="noopener noreferrer"
               style={{
                 fontSize: "14px",
-                color: darkMode ? "#38bdf8" : "#2563eb",
+                color: "#2563eb",
                 textDecoration: "none",
                 wordBreak: "break-all",
-                display: "block",
-                marginBottom: "6px",
               }}
             >
               {selectedRepo.url}
             </a>
-
             <div
-              style={{
-                fontSize: "14px",
-                color: darkMode ? "#94a3b8" : "#64748b",
-              }}
-            >
-              Branch: <strong>{selectedRepo.branch}</strong>
-            </div>
+  style={{
+    fontSize: "14px",
+    marginTop: "6px",
+    color: darkMode ? "#cbd5e1" : "#334155",
+  }}
+>
+  Branch: <strong>{selectedRepo.branch}</strong>
+</div>
+
           </div>
 
-          {/* RIGHT */}
-          <div
-            style={{
-              display: "flex",
-              flexDirection: "column",
-              gap: "8px",
-              fontSize: "14px",
-              color: darkMode ? "#94a3b8" : "#64748b",
-            }}
-          >
-            <span>🔓 Visibility: {selectedRepo.visibility}</span>
-            <span>💻 Language: {selectedRepo.language}</span>
-            <span>⏱ Last synced: {selectedRepo.lastSynced}</span>
+          <div style={{ fontSize: "14px", color: "#64748b" }}>
+            <div>Visibility: {selectedRepo.visibility}</div>
+            <div>Language: {selectedRepo.language}</div>
+            <div>Last synced: {selectedRepo.lastSynced}</div>
           </div>
         </div>
 
@@ -191,7 +190,7 @@ function Dashboard() {
           </div>
         </section>
 
-        {/* CHARTS */}
+        {/* CHARTS (UNCHANGED) */}
         <section style={{ marginBottom: "48px" }}>
           <div
             style={{
@@ -216,7 +215,7 @@ function Dashboard() {
           </div>
         </section>
 
-        {/* BUG SEVERITY + INSIGHTS */}
+        {/* BUG SEVERITY + INSIGHTS (UNCHANGED) */}
         <section>
           <div
             style={{
@@ -225,14 +224,7 @@ function Dashboard() {
               gap: "24px",
             }}
           >
-            <div
-              style={{
-                ...cardStyle,
-                height: "360px",
-                display: "flex",
-                flexDirection: "column",
-              }}
-            >
+            <div style={{ ...cardStyle, height: "360px" }}>
               <h3 style={{ marginBottom: "12px", color: textColor }}>
                 Bug Severity
               </h3>
@@ -246,7 +238,6 @@ function Dashboard() {
         </section>
       </div>
 
-      {/* FOOTER */}
       <Footer />
     </div>
   );
