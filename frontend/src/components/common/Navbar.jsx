@@ -1,8 +1,11 @@
 import React, { useState, useRef, useEffect } from "react";
+import { useNavigate } from "react-router-dom";
 import { useTheme } from "../../context/ThemeContext";
 
 function Navbar() {
   const { darkMode, toggleTheme } = useTheme();
+  const navigate = useNavigate();
+
   const [open, setOpen] = useState(false);
   const [showModal, setShowModal] = useState(false);
   const dropdownRef = useRef(null);
@@ -12,12 +15,13 @@ function Navbar() {
     username: "someshwar_01",
     email: "someshwar@gmail.com",
     phone: "9876543210",
-    profilePic: "https://i.pravatar.cc/100",
+    avatar: "https://i.pravatar.cc/150",
     currentPassword: "",
     newPassword: "",
     confirmPassword: "",
   });
 
+  /* ================= OUTSIDE CLICK ================= */
   useEffect(() => {
     function handleClickOutside(e) {
       if (dropdownRef.current && !dropdownRef.current.contains(e.target)) {
@@ -29,68 +33,115 @@ function Navbar() {
       document.removeEventListener("mousedown", handleClickOutside);
   }, []);
 
-  const handleChange = (e) =>
-    setUser({ ...user, [e.target.name]: e.target.value });
+  /* ================= LOGOUT ================= */
+  const handleLogout = () => {
+    localStorage.removeItem("isLoggedIn");
+    navigate("/login");
+  };
 
-  // ✅ Profile image upload (ONLY from Edit Profile)
-  const handleProfilePicUpload = (e) => {
+  /* ================= INPUT CHANGE ================= */
+  const handleChange = (e) => {
+    setUser({ ...user, [e.target.name]: e.target.value });
+  };
+
+  /* ================= IMAGE UPLOAD ================= */
+  const handleImageUpload = (e) => {
     const file = e.target.files[0];
-    if (!file) return;
-    const previewURL = URL.createObjectURL(file);
-    setUser({ ...user, profilePic: previewURL });
+    if (file) {
+      const url = URL.createObjectURL(file);
+      setUser({ ...user, avatar: url });
+    }
   };
 
   return (
     <>
-      {/* NAVBAR */}
+      {/* ================= NAVBAR ================= */}
       <header
         style={{
+          height: "64px",
+          padding: "0 24px",
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "space-between",
           position: "fixed",
           top: 0,
           left: 0,
           right: 0,
-          height: "64px",
-          zIndex: 9999,
+          zIndex: 1000,
           backgroundColor: darkMode ? "#020617" : "#ffffff",
-          color: darkMode ? "#f8fafc" : "#020617",
-          display: "flex",
-          alignItems: "center",
-          justifyContent: "space-between",
-          padding: "0 24px",
           borderBottom: darkMode
             ? "1px solid #1e293b"
             : "1px solid #e5e7eb",
         }}
       >
-        <div style={{ fontSize: "18px", fontWeight: 600 }}>
+        <h3 style={{ color: darkMode ? "#f8fafc" : "#020617" }}>
           Software Metrics Dashboard
-        </div>
-
-        {/* <input placeholder="Search metrics..." style={inputStyle(darkMode)} /> */}
+        </h3>
 
         <div style={{ display: "flex", alignItems: "center", gap: "16px" }}>
-          {/* <span style={{ fontSize: "13px" }}>
-            📦 Repo: <strong>Not Selected</strong>
-          </span> */}
-
-          <button onClick={toggleTheme} style={themeBtn(darkMode)}>
+          <button
+            onClick={toggleTheme}
+            style={{
+              padding: "6px 10px",
+              borderRadius: "6px",
+              border: darkMode
+                ? "1px solid #334155"
+                : "1px solid #cbd5e1",
+              background: "transparent",
+              color: darkMode ? "#f8fafc" : "#020617",
+              cursor: "pointer",
+            }}
+          >
             {darkMode ? "☀ Light" : "🌙 Dark"}
           </button>
 
-          {/* PROFILE AVATAR (ONLY DROPDOWN) */}
+          {/* PROFILE */}
           <div ref={dropdownRef} style={{ position: "relative" }}>
             <img
-              src={user.profilePic}
+              src={user.avatar}
               alt="profile"
               onClick={() => setOpen(!open)}
-              style={avatarStyle(darkMode)}
+              style={{
+                width: "36px",
+                height: "36px",
+                borderRadius: "50%",
+                cursor: "pointer",
+                border: darkMode
+                  ? "2px solid #38bdf8"
+                  : "2px solid #2563eb",
+              }}
             />
 
             {open && (
-              <div style={dropdownStyle(darkMode)}>
-                <div style={userInfoStyle(darkMode)}>
-                  <strong>{user.name}</strong>
-                  <div style={{ fontSize: "12px", opacity: 0.8 }}>
+              <div
+                style={{
+                  position: "absolute",
+                  right: 0,
+                  top: "46px",
+                  width: "220px",
+                  backgroundColor: darkMode ? "#020617" : "#ffffff",
+                  border: darkMode
+                    ? "1px solid #1e293b"
+                    : "1px solid #e5e7eb",
+                  borderRadius: "12px",
+                }}
+              >
+                <div
+                  style={{
+                    padding: "14px",
+                    borderBottom: darkMode
+                      ? "1px solid #1e293b"
+                      : "1px solid #e5e7eb",
+                  }}
+                >
+                  <strong
+                    style={{
+                      color: darkMode ? "#f8fafc" : "#020617",
+                    }}
+                  >
+                    {user.name}
+                  </strong>
+                  <div style={{ fontSize: "12px", color: "#94a3b8" }}>
                     {user.email}
                   </div>
                 </div>
@@ -101,138 +152,127 @@ function Navbar() {
                     setShowModal(true);
                     setOpen(false);
                   }}
+                  darkMode={darkMode}
                 />
-                <Divider darkMode={darkMode} />
-                <DropdownItem label="🚪 Logout" danger />
+
+                <DropdownItem
+                  label="🚪 Logout"
+                  danger
+                  onClick={handleLogout}
+                  darkMode={darkMode}
+                />
               </div>
             )}
           </div>
         </div>
       </header>
 
-      {/* EDIT PROFILE MODAL */}
+      {/* ================= EDIT PROFILE MODAL ================= */}
       {showModal && (
-        <div style={overlayStyle}>
-          <div style={modalStyle(darkMode)}>
+        <div style={overlay}>
+          <div
+            style={{
+              width: "420px",
+              padding: "24px",
+              borderRadius: "14px",
+              backgroundColor: darkMode ? "#020617" : "#ffffff",
+              color: darkMode ? "#f8fafc" : "#020617",
+            }}
+          >
             <h3 style={{ marginBottom: "12px" }}>Edit Profile</h3>
 
-            {/* PROFILE IMAGE + UPLOAD */}
-            <div style={{ textAlign: "center", marginBottom: "16px" }}>
-              <img
-                src={user.profilePic}
-                alt="profile"
-                style={{
-                  width: "80px",
-                  height: "80px",
-                  borderRadius: "50%",
-                  objectFit: "cover",
-                  border: darkMode
-                    ? "2px solid #38bdf8"
-                    : "2px solid #2563eb",
-                }}
-              />
+   {/* PROFILE IMAGE SECTION */}
+<div
+  style={{
+    display: "flex",
+    flexDirection: "column",   // 🔑 MOST IMPORTANT
+    alignItems: "center",
+    marginBottom: "18px",
+  }}
+>
+  {/* PROFILE IMAGE */}
+  <img
+    src={user.avatar}
+    alt="profile"
+    style={{
+      width: "90px",
+      height: "90px",
+      borderRadius: "50%",
+      objectFit: "cover",
+      border: "3px solid #2563eb",
+    }}
+  />
 
-              <label
-                style={{
-                  display: "block",
-                  marginTop: "8px",
-                  fontSize: "13px",
-                  color: "#2563eb",
-                  cursor: "pointer",
-                }}
-              >
-                Change Profile Picture
+  {/* CHANGE PHOTO — NOW JUST BELOW IMAGE */}
+  <label
+    style={{
+      marginTop: "8px",          // 🔑 spacing below image
+      fontSize: "14px",
+      fontWeight: "500",
+      color: darkMode ? "#38bdf8" : "#2563eb",
+      cursor: "pointer",
+    }}
+  >
+    Change Photo
+    <input
+      type="file"
+      accept="image/*"
+      style={{ display: "none" }}
+      onChange={handleImageUpload}
+    />
+  </label>
+</div>
+
+
+
+            {/* BASIC INFO */}
+            {["name", "username", "email", "phone"].map((field) => (
+              <div key={field}>
+                <label style={labelStyle}>
+                  {field.charAt(0).toUpperCase() + field.slice(1)}
+                </label>
                 <input
-                  type="file"
-                  accept="image/*"
-                  onChange={handleProfilePicUpload}
-                  style={{ display: "none" }}
+                  name={field}
+                  value={user[field]}
+                  onChange={handleChange}
+                  style={inputStyle(darkMode)}
                 />
-              </label>
-            </div>
+              </div>
+            ))}
 
-            <Label>Full Name</Label>
-            <input
-              name="name"
-              value={user.name}
-              onChange={handleChange}
-              style={modalInput(darkMode)}
-            />
+            {/* PASSWORD SECTION (NEW – ONLY ADDITION) */}
+            <hr style={{ margin: "16px 0", borderColor: "#334155" }} />
 
-            <Label>Username</Label>
-            <input
-              name="username"
-              value={user.username}
-              onChange={handleChange}
-              style={modalInput(darkMode)}
-            />
-
-            <Label>Email</Label>
-            <input
-              name="email"
-              value={user.email}
-              onChange={handleChange}
-              style={modalInput(darkMode)}
-            />
-
-            <Label>Phone</Label>
-            <input
-              name="phone"
-              value={user.phone}
-              onChange={handleChange}
-              style={modalInput(darkMode)}
-            />
-
-            <hr
-              style={{
-                margin: "12px 0",
-                border: "none",
-                borderTop: darkMode
-                  ? "1px solid #334155"
-                  : "1px solid #e5e7eb",
-              }}
-            />
-
-            <Label>Current Password</Label>
+            <label style={labelStyle}>Current Password</label>
             <input
               type="password"
               name="currentPassword"
               value={user.currentPassword}
               onChange={handleChange}
-              style={modalInput(darkMode)}
+              style={inputStyle(darkMode)}
             />
 
-            <Label>New Password</Label>
+            <label style={labelStyle}>New Password</label>
             <input
               type="password"
               name="newPassword"
               value={user.newPassword}
               onChange={handleChange}
-              style={modalInput(darkMode)}
+              style={inputStyle(darkMode)}
             />
 
-            <Label>Confirm Password</Label>
+            <label style={labelStyle}>Confirm Password</label>
             <input
               type="password"
               name="confirmPassword"
               value={user.confirmPassword}
               onChange={handleChange}
-              style={modalInput(darkMode)}
+              style={inputStyle(darkMode)}
             />
 
-            <div
-              style={{
-                display: "flex",
-                justifyContent: "flex-end",
-                gap: "12px",
-                marginTop: "12px",
-              }}
-            >
-              <button onClick={() => setShowModal(false)} style={cancelBtn}>
-                Cancel
-              </button>
-              <button onClick={() => setShowModal(false)} style={saveBtn}>
-                Save Changes
+            <div style={{ textAlign: "right", marginTop: "12px" }}>
+              <button onClick={() => setShowModal(false)} style={closeBtn}>
+                Close
               </button>
             </div>
           </div>
@@ -242,132 +282,58 @@ function Navbar() {
   );
 }
 
-/* ---------- STYLES ---------- */
+/* ================= STYLES ================= */
 
-const Label = ({ children }) => {
-  const { darkMode } = useTheme();
-  return (
-    <label
-      style={{
-        fontSize: "13px",
-        marginTop: "8px",
-        display: "block",
-        color: darkMode ? "#cbd5f5" : "#334155",
-      }}
-    >
-      {children}
-    </label>
-  );
-};
+const DropdownItem = ({ label, onClick, danger, darkMode }) => (
+  <div
+    onClick={onClick}
+    style={{
+      padding: "10px 14px",
+      cursor: "pointer",
+      color: danger
+        ? "#ef4444"
+        : darkMode
+        ? "#f8fafc"
+        : "#020617",
+    }}
+  >
+    {label}
+  </div>
+);
 
-const inputStyle = (dark) => ({
-  width: "220px",
-  padding: "6px 10px",
-  borderRadius: "6px",
-  border: dark ? "1px solid #334155" : "1px solid #cbd5e1",
-  backgroundColor: dark ? "#020617" : "#ffffff",
-  color: dark ? "#f8fafc" : "#020617",
-});
-
-const themeBtn = (dark) => ({
-  padding: "6px 10px",
-  borderRadius: "6px",
-  border: dark ? "1px solid #334155" : "1px solid #cbd5e1",
-  background: "transparent",
-  cursor: "pointer",
-  color: dark ? "#f8fafc" : "#020617",
-});
-
-const avatarStyle = (dark) => ({
-  width: "36px",
-  height: "36px",
-  borderRadius: "50%",
-  cursor: "pointer",
-  border: dark ? "2px solid #38bdf8" : "2px solid #2563eb",
-});
-
-const dropdownStyle = (dark) => ({
-  position: "absolute",
-  right: 0,
-  top: "46px",
-  width: "220px",
-  backgroundColor: dark ? "#020617" : "#ffffff",
-  border: dark ? "1px solid #1e293b" : "1px solid #e5e7eb",
-  borderRadius: "12px",
-});
-
-const userInfoStyle = (dark) => ({
-  padding: "14px",
-  borderBottom: dark ? "1px solid #1e293b" : "1px solid #e5e7eb",
-});
-
-const overlayStyle = {
+const overlay = {
   position: "fixed",
   inset: 0,
   backgroundColor: "rgba(0,0,0,0.6)",
   display: "flex",
   justifyContent: "center",
   alignItems: "center",
-  zIndex: 10000,
+  zIndex: 9999,
 };
 
-const modalStyle = (dark) => ({
-  width: "420px",
-  backgroundColor: dark ? "#020617" : "#ffffff",
-  color: dark ? "#f8fafc" : "#020617",
-  padding: "24px",
-  borderRadius: "14px",
-  marginTop: "64px",
-});
+const labelStyle = {
+  fontSize: "13px",
+  color: "#94a3b8",
+  display: "block",
+  marginTop: "8px",
+};
 
-const modalInput = (dark) => ({
+const inputStyle = (dark) => ({
   width: "100%",
   padding: "8px",
-  marginBottom: "6px",
   borderRadius: "6px",
   border: dark ? "1px solid #334155" : "1px solid #cbd5e1",
   backgroundColor: dark ? "#020617" : "#ffffff",
   color: dark ? "#f8fafc" : "#020617",
 });
 
-const cancelBtn = {
-  padding: "8px 14px",
-  borderRadius: "6px",
-  border: "1px solid #cbd5e1",
-};
-
-const saveBtn = {
-  padding: "8px 14px",
+const closeBtn = {
+  padding: "6px 14px",
   borderRadius: "6px",
   border: "none",
   background: "#2563eb",
   color: "white",
+  cursor: "pointer",
 };
-
-function DropdownItem({ label, danger, onClick }) {
-  return (
-    <div
-      onClick={onClick}
-      style={{
-        padding: "10px 14px",
-        cursor: "pointer",
-        color: danger ? "#ef4444" : "inherit",
-      }}
-    >
-      {label}
-    </div>
-  );
-}
-
-function Divider({ darkMode }) {
-  return (
-    <div
-      style={{
-        height: "1px",
-        backgroundColor: darkMode ? "#1e293b" : "#e5e7eb",
-      }}
-    />
-  );
-}
 
 export default Navbar;
