@@ -1,55 +1,60 @@
 import React from "react";
 import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
 
+import Login from "./pages/Login";
+import Signup from "./pages/Signup";
+import ForgotPassword from "./pages/ForgotPassword";
 import RepoInput from "./pages/RepoInput";
 import Dashboard from "./pages/Dashboard";
 
-import { ThemeProvider } from "./context/ThemeContext";
+import { AuthProvider, useAuth } from "./context/AuthContext";
 
-/**
- * App Flow:
- * 1. "/"        → RepoInput (GitHub URL input page)
- * 2. "/dashboard" → Dashboard (opens AFTER repo is saved)
- */
+/* 🔒 Protected Route */
+function PrivateRoute({ children }) {
+  const { user } = useAuth();
+  return user ? children : <Navigate to="/login" />;
+}
 
 function App() {
   return (
-    <ThemeProvider>
+    <AuthProvider>
       <BrowserRouter>
         <Routes>
-          {/* STEP 1: Repo Input Page */}
-          <Route path="/" element={<RepoInput />} />
+          {/* Auth pages */}
+          <Route path="/signup" element={<Signup />} />
+<Route path="/login" element={<Login />} />
+<Route path="/repo-input" element={<RepoInput />} />
+<Route path="/dashboard" element={<Dashboard />} />
 
-          {/* STEP 2: Dashboard */}
+
+          <Route path="/forgot-password" element={<ForgotPassword />} />
+
+          {/* After login */}
           <Route
-            path="/dashboard"
+            path="/repo"
             element={
-              <RequireRepo>
-                <Dashboard />
-              </RequireRepo>
+              <PrivateRoute>
+                <RepoInput />
+              </PrivateRoute>
             }
           />
 
-          {/* Fallback */}
-          <Route path="*" element={<Navigate to="/" />} />
+          {/* After repo analysis */}
+          <Route
+            path="/dashboard"
+            element={
+              <PrivateRoute>
+                <Dashboard />
+              </PrivateRoute>
+            }
+          />
+
+          {/* Default */}
+          <Route path="*" element={<Navigate to="/login" />} />
         </Routes>
       </BrowserRouter>
-    </ThemeProvider>
+    </AuthProvider>
   );
-}
-
-/**
- * 🔒 Guard Route:
- * If repo not selected → redirect to RepoInput
- */
-function RequireRepo({ children }) {
-  const repo = localStorage.getItem("selectedRepo");
-
-  if (!repo) {
-    return <Navigate to="/" replace />;
-  }
-
-  return children;
 }
 
 export default App;
