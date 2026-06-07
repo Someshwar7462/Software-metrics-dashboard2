@@ -1,47 +1,7 @@
 import React, { useState } from "react";
 import { useNavigate, Link } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
-
-/* ================= PAGE STYLES ================= */
-
-const pageStyle = {
-  minHeight: "100vh",
-  display: "flex",
-  alignItems: "center",
-  justifyContent: "center",
-  backgroundColor: "#f1f5f9",
-};
-
-const cardStyle = {
-  width: "420px",
-  padding: "28px",
-  borderRadius: "12px",
-  backgroundColor: "#ffffff",
-  boxShadow: "0 10px 25px rgba(0,0,0,0.1)",
-};
-
-const inputStyle = {
-  width: "100%",
-  padding: "10px",
-  marginBottom: "12px",
-  borderRadius: "6px",
-  border: "1px solid #cbd5e1",
-  fontSize: "14px",
-};
-
-const buttonStyle = {
-  width: "100%",
-  padding: "10px",
-  backgroundColor: "#2563eb",
-  color: "white",
-  border: "none",
-  borderRadius: "6px",
-  cursor: "pointer",
-  fontSize: "15px",
-  fontWeight: "500",
-};
-
-/* ================================================= */
+import AuthLayout from "../components/common/AuthLayout";
 
 function Signup() {
   const navigate = useNavigate();
@@ -90,84 +50,108 @@ function Signup() {
   };
 
   return (
-    <div style={pageStyle}>
-      <div style={cardStyle}>
-        <h2 style={{ marginBottom: "20px", textAlign: "center" }}>
-          Create Account
-        </h2>
+    <AuthLayout
+      badge="Get started"
+      icon="🚀"
+      title="Create account"
+      subtitle="Join the dashboard to analyze repos, track bugs, and monitor test coverage."
+      wide
+      footer={
+        <>
+          Already have an account? <Link to="/login">Sign in</Link>
+        </>
+      }
+    >
+      {error && <div className="auth-error">{error}</div>}
 
-        {error && (
-          <p style={{ color: "red", marginBottom: "12px" }}>
-            {error}
-          </p>
-        )}
-
-        <form onSubmit={handleSignup}>
+      <form onSubmit={handleSignup}>
+        <div className="auth-input-group">
+          <label className="auth-label" htmlFor="signup-name">
+            Full Name
+          </label>
           <input
+            id="signup-name"
             name="fullName"
-            placeholder="Full Name"
-            style={inputStyle}
+            placeholder="John Doe"
+            className="auth-input"
             value={form.fullName}
             onChange={handleChange}
             required
           />
+        </div>
 
+        <div className="auth-input-group">
+          <label className="auth-label" htmlFor="signup-email">
+            Email
+          </label>
           <input
+            id="signup-email"
             name="email"
             type="email"
-            placeholder="Email"
-            style={inputStyle}
+            placeholder="you@example.com"
+            className="auth-input"
             value={form.email}
             onChange={handleChange}
             required
           />
+        </div>
 
+        <div className="auth-input-group">
+          <label className="auth-label" htmlFor="signup-phone">
+            Phone Number
+          </label>
           <input
+            id="signup-phone"
             name="phone"
-            placeholder="Phone Number"
-            style={inputStyle}
+            placeholder="+1 234 567 8900"
+            className="auth-input"
             value={form.phone}
             onChange={handleChange}
             required
           />
+        </div>
 
+        <div className="auth-input-group">
+          <label className="auth-label" htmlFor="signup-password">
+            Password
+          </label>
           <input
+            id="signup-password"
             name="password"
             type="password"
-            placeholder="Password"
-            style={inputStyle}
+            placeholder="Min. 6 characters"
+            className="auth-input"
             value={form.password}
             onChange={handleChange}
             required
           />
+        </div>
 
+        <div className="auth-input-group">
+          <label className="auth-label" htmlFor="signup-confirm">
+            Confirm Password
+          </label>
           <input
+            id="signup-confirm"
             name="confirmPassword"
             type="password"
-            placeholder="Confirm Password"
-            style={inputStyle}
+            placeholder="Repeat your password"
+            className="auth-input"
             value={form.confirmPassword}
             onChange={handleChange}
             required
           />
-
-          <button type="submit" style={buttonStyle} disabled={loading}>
-            {loading ? "Creating account..." : "Sign Up"}
-          </button>
-        </form>
-
-        <div
-          style={{
-            marginTop: "16px",
-            textAlign: "center",
-            fontSize: "14px",
-          }}
-        >
-          Already have an account?{" "}
-          <Link to="/login">Login</Link>
         </div>
-      </div>
-    </div>
+
+        <button
+          type="submit"
+          className={`auth-btn ${loading ? "auth-btn-loading" : ""}`}
+          disabled={loading}
+        >
+          {loading ? "Creating account..." : "Create Account"}
+        </button>
+      </form>
+    </AuthLayout>
   );
 }
 

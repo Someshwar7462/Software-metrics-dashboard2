@@ -1,25 +1,45 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { generateDummyMetrics } from "../utils/dummyMetrics";
+import AuthLayout from "../components/common/AuthLayout";
+
+const LOADING_STEPS = [
+  "Connecting to GitHub...",
+  "Fetching repository details...",
+  "Counting commits...",
+  "Generating metrics dashboard...",
+];
 
 function RepoInput() {
   const [repoUrl, setRepoUrl] = useState("");
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
+  const [loadingStep, setLoadingStep] = useState(0);
 
   const navigate = useNavigate();
+
+  useEffect(() => {
+    if (!loading) {
+      setLoadingStep(0);
+      return;
+    }
+
+    const interval = setInterval(() => {
+      setLoadingStep((prev) =>
+        prev < LOADING_STEPS.length - 1 ? prev + 1 : prev
+      );
+    }, 900);
+
+    return () => clearInterval(interval);
+  }, [loading]);
 
   const handleAnalyze = async () => {
     setError("");
     setLoading(true);
+    setLoadingStep(0);
 
     try {
-      // -------------------------------
-      // 1️⃣ Parse GitHub URL
-      // -------------------------------
-      const match = repoUrl.match(
-        /github\.com\/([^/]+)\/([^/]+)/
-      );
+      const match = repoUrl.match(/github\.com\/([^/]+)\/([^/]+)/);
 
       if (!match) {
         throw new Error("Invalid GitHub repository URL");
@@ -28,9 +48,6 @@ function RepoInput() {
       const owner = match[1];
       const repo = match[2];
 
-      // -------------------------------
-      // 2️⃣ Fetch repository details
-      // -------------------------------
       const repoRes = await fetch(
         `https://api.github.com/repos/${owner}/${repo}`
       );
@@ -40,11 +57,8 @@ function RepoInput() {
       }
 
       const repoData = await repoRes.json();
+      setLoadingStep(2);
 
-      // -------------------------------
-      // 3️⃣ Fetch REAL commits count
-      //    (Pagination trick)
-      // -------------------------------
       const commitsRes = await fetch(
         `https://api.github.com/repos/${owner}/${repo}/commits?per_page=1`
       );
@@ -54,19 +68,17 @@ function RepoInput() {
       let totalCommits = 0;
 
       if (linkHeader) {
-        const match = linkHeader.match(/page=(\d+)>; rel="last"/);
-        if (match) {
-          totalCommits = parseInt(match[1], 10);
+        const pageMatch = linkHeader.match(/page=(\d+)>; rel="last"/);
+        if (pageMatch) {
+          totalCommits = parseInt(pageMatch[1], 10);
         }
       } else {
-        // Repo with very few commits
         const commitsJson = await commitsRes.json();
         totalCommits = commitsJson.length;
       }
 
-      // -------------------------------
-      // 4️⃣ Generate dummy metrics (commits stay from GitHub API)
-      // -------------------------------
+      setLoadingStep(3);
+
       const dummyMetrics = generateDummyMetrics(`${owner}/${repo}`, totalCommits);
 
       const storedData = {
@@ -93,10 +105,6 @@ function RepoInput() {
       };
 
       localStorage.setItem("selectedRepo", JSON.stringify(storedData));
-
-      // -------------------------------
-      // 5️⃣ Navigate to Dashboard
-      // -------------------------------
       navigate("/dashboard");
     } catch (err) {
       setError(err.message);
@@ -105,67 +113,86 @@ function RepoInput() {
     }
   };
 
-  return (
-    <div
-      style={{
-        minHeight: "100vh",
-        display: "flex",
-        alignItems: "center",
-        justifyContent: "center",
-        backgroundColor: "#f1f5f9",
-      }}
-    >
-      <div
-        style={{
-          width: "420px",
-          padding: "28px",
-          borderRadius: "16px",
-          backgroundColor: "#ffffff",
-          boxShadow: "0 10px 30px rgba(0,0,0,0.1)",
-        }}
-      >
-        <h2 style={{ marginBottom: "16px" }}>
-          Analyze GitHub Repository
-        </h2>
+  const handleKeyDown = (e) => {
+    if (e.key === "Enter" && !loading) {
+      handleAnalyze();
+    }
+  };
 
+  return (
+    <AuthLayout
+      badge="Repository analysis"
+      icon="⚡"
+      title="Analyze GitHub Repo"
+      subtitle="Paste any public GitHub URL to generate bugs, coverage, and commit insights instantly."
+      wide
+    >
+      <div className="auth-features">
+        <span className="auth-feature-pill">
+          <span>🐛</span> Bug metrics
+        </span>
+        <span className="auth-feature-pill">
+          <span>🧪</span> Test coverage
+        </span>
+        <span className="auth-feature-pill">
+          <span>📦</span> Commit trends
+        </span>
+      </div>
+
+      {error && <div className="auth-error">{error}</div>}
+
+      <div className={loading ? "auth-scan-line" : ""}>
+        <label className="auth-label" htmlFor="repo-url">
+          GitHub Repository URL
+        </label>
         <input
+          id="repo-url"
           type="text"
           placeholder="https://github.com/username/repository"
           value={repoUrl}
           onChange={(e) => setRepoUrl(e.target.value)}
-          style={{
-            width: "100%",
-            padding: "10px",
-            borderRadius: "8px",
-            border: "1px solid #cbd5e1",
-            marginBottom: "12px",
-          }}
-        />
-
-        {error && (
-          <p style={{ color: "red", marginBottom: "12px" }}>
-            {error}
-          </p>
-        )}
-
-        <button
-          onClick={handleAnalyze}
+          onKeyDown={handleKeyDown}
+          className="auth-input"
           disabled={loading}
-          style={{
-            width: "100%",
-            padding: "10px",
-            borderRadius: "8px",
-            border: "none",
-            backgroundColor: "#2563eb",
-            color: "white",
-            fontWeight: "600",
-            cursor: "pointer",
-          }}
-        >
-          {loading ? "Analyzing..." : "Analyze Repository"}
-        </button>
+          style={{ marginBottom: loading ? 0 : 20 }}
+        />
       </div>
-    </div>
+
+      {loading && (
+        <div className="auth-loading-panel">
+          {LOADING_STEPS.map((step, index) => (
+            <div
+              key={step}
+              className={`auth-loading-step ${
+                index < loadingStep
+                  ? "done"
+                  : index === loadingStep
+                  ? "active"
+                  : ""
+              }`}
+            >
+              {index < loadingStep ? (
+                <span className="auth-check">✓</span>
+              ) : index === loadingStep ? (
+                <span className="auth-spinner" />
+              ) : (
+                <span style={{ width: 16, height: 16, flexShrink: 0 }} />
+              )}
+              {step}
+            </div>
+          ))}
+        </div>
+      )}
+
+      <button
+        onClick={handleAnalyze}
+        disabled={loading || !repoUrl.trim()}
+        className={`auth-btn ${loading ? "auth-btn-loading" : ""}`}
+        style={{ marginTop: loading ? 20 : 0 }}
+      >
+        {loading ? "Analyzing repository..." : "Analyze Repository"}
+      </button>
+    </AuthLayout>
   );
 }
 

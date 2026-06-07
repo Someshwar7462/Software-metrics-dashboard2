@@ -241,7 +241,15 @@ function Dashboard() {
               <BugSeverityPieChart data={bugSeverity} />
             </div>
 
-            <div style={{ ...cardStyle, height: "360px" }}>
+            <div
+              style={{
+                ...cardStyle,
+                height: "360px",
+                display: "flex",
+                flexDirection: "column",
+                overflow: "hidden",
+              }}
+            >
               <ActionableInsights metrics={metricsData} />
             </div>
           </div>

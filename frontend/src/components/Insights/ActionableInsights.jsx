@@ -7,17 +7,10 @@ function ActionableInsights({ metrics }) {
   const headingColor = darkMode ? "#f8fafc" : "#020617";
   const textColor = darkMode ? "#e5e7eb" : "#475569";
 
-  const {
-    criticalBugs,
-    majorBugs,
-    testCoverage,
-    buildStatus,
-    commits,
-  } = metrics;
+  const { criticalBugs, majorBugs, testCoverage, buildStatus } = metrics;
 
   const insights = [];
 
-  // 🔴 Critical bugs rule
   if (criticalBugs > 0) {
     insights.push({
       level: "critical",
@@ -25,7 +18,6 @@ function ActionableInsights({ metrics }) {
     });
   }
 
-  // 🟡 Test coverage rule
   if (testCoverage < 80) {
     insights.push({
       level: "warning",
@@ -33,7 +25,6 @@ function ActionableInsights({ metrics }) {
     });
   }
 
-  // 🟡 Major bugs rule
   if (majorBugs > 5) {
     insights.push({
       level: "warning",
@@ -41,7 +32,6 @@ function ActionableInsights({ metrics }) {
     });
   }
 
-  // 🔴 Build failed rule
   if (buildStatus !== "PASS") {
     insights.push({
       level: "critical",
@@ -49,7 +39,6 @@ function ActionableInsights({ metrics }) {
     });
   }
 
-  // 🟢 Healthy case
   if (insights.length === 0) {
     insights.push({
       level: "healthy",
@@ -64,66 +53,77 @@ function ActionableInsights({ metrics }) {
   };
 
   return (
-  <div>
-    {/* TITLE */}
-    <h3
+    <div
       style={{
-        marginBottom: "16px",
-        fontSize: "22px",
-        fontWeight: "600",
-        color: headingColor,
+        display: "flex",
+        flexDirection: "column",
+        height: "100%",
+        minHeight: 0,
       }}
     >
-      Actionable Insights
-    </h3>
+      <h3
+        style={{
+          margin: "0 0 10px",
+          fontSize: "18px",
+          fontWeight: "600",
+          color: headingColor,
+          flexShrink: 0,
+        }}
+      >
+        Actionable Insights
+      </h3>
 
-    {/* OVERALL NOTE */}
-    <p
-      style={{
-        fontSize: "16px",
-        marginBottom: "18px",
-        color: textColor,
-        lineHeight: "1.6",
-      }}
-    >
-      Below are the key observations derived from your project metrics.
-      Addressing these points will significantly improve code quality,
-      stability, and release confidence.
-    </p>
+      <div
+        style={{
+          flex: 1,
+          minHeight: 0,
+          overflowY: "auto",
+          paddingRight: "4px",
+        }}
+      >
+        <p
+          style={{
+            fontSize: "14px",
+            margin: "0 0 12px",
+            color: textColor,
+            lineHeight: "1.5",
+          }}
+        >
+          Key observations from your project metrics. Addressing these improves
+          code quality, stability, and release confidence.
+        </p>
 
-    {/* INSIGHTS */}
-    <ul
-      style={{
-        paddingLeft: "20px",
-        fontSize: "17px",
-        lineHeight: "2",
-        color: textColor,
-        marginBottom: "24px",
-      }}
-    >
-      <li>🔴 <strong>Fix critical bugs</strong> before the next release cycle</li>
-      <li>🟡 <strong>Improve test coverage</strong> to at least <b>80%</b></li>
-      <li>🟠 <strong>Review unresolved major bugs</strong> to reduce technical debt</li>
-    </ul>
+        <ul
+          style={{
+            paddingLeft: "18px",
+            margin: "0 0 14px",
+            fontSize: "14px",
+            lineHeight: "1.6",
+            color: textColor,
+          }}
+        >
+          {insights.map((item, index) => (
+            <li key={index} style={{ marginBottom: "6px" }}>
+              {getIcon(item.level)} {item.message}
+            </li>
+          ))}
+        </ul>
 
-    {/* EXTRA GUIDANCE */}
-    <p
-  style={{
-    marginTop: "14px",
-    fontSize: "15px",
-    lineHeight: "1.6",
-    color: textColor,
-  }}
->
-  <strong>Why this matters:</strong> Resolving high-severity issues early
-  prevents production failures, improves team velocity, and ensures smoother
-  deployments. Consistent monitoring of these insights helps maintain long-term
-  software health.
-</p>
-
-  </div>
-);
-
+        <p
+          style={{
+            margin: 0,
+            fontSize: "13px",
+            lineHeight: "1.5",
+            color: textColor,
+          }}
+        >
+          <strong>Why this matters:</strong> Resolving high-severity issues early
+          prevents production failures, improves team velocity, and ensures
+          smoother deployments.
+        </p>
+      </div>
+    </div>
+  );
 }
 
 export default ActionableInsights;
