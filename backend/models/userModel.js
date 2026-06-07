@@ -1,4 +1,6 @@
 const mongoose = require("mongoose");
+const { isValidEmail } = require("../utils/validateEmail");
+const { isValidPhone } = require("../utils/validatePhone");
 
 const userSchema = new mongoose.Schema(
   {
@@ -13,11 +15,19 @@ const userSchema = new mongoose.Schema(
       unique: true,
       lowercase: true,
       trim: true,
+      validate: {
+        validator: isValidEmail,
+        message: "Please enter a valid email address",
+      },
     },
     phone: {
       type: String,
-      default: "",
+      required: [true, "Phone number is required"],
       trim: true,
+      validate: {
+        validator: isValidPhone,
+        message: "Please enter a valid 10-digit phone number",
+      },
     },
     username: {
       type: String,

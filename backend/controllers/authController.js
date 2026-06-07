@@ -1,6 +1,8 @@
 const bcrypt = require("bcryptjs");
 const jwt = require("jsonwebtoken");
 const User = require("../models/userModel");
+const { isValidEmail } = require("../utils/validateEmail");
+const { isValidPhone } = require("../utils/validatePhone");
 
 const JWT_SECRET = process.env.JWT_SECRET || "metrics_dashboard_secret";
 
@@ -37,6 +39,18 @@ exports.signup = async (req, res) => {
         .json({ message: "Password must be at least 6 characters" });
     }
 
+    if (!isValidEmail(email)) {
+      return res.status(400).json({
+        message: "Please enter a valid email address (e.g. you@example.com)",
+      });
+    }
+
+    if (!phone || !isValidPhone(phone)) {
+      return res.status(400).json({
+        message: "Please enter a valid 10-digit phone number",
+      });
+    }
+
     const normalizedEmail = email.toLowerCase().trim();
     const existingUser = await User.findOne({ email: normalizedEmail });
 
@@ -54,7 +68,7 @@ exports.signup = async (req, res) => {
     const user = await User.create({
       name: fullName.trim(),
       email: normalizedEmail,
-      phone: phone?.trim() || "",
+      phone: phone.trim(),
       password: hashedPassword,
       username,
     });

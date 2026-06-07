@@ -2,6 +2,8 @@ import React, { useState } from "react";
 import { useNavigate, Link } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
 import AuthLayout from "../components/common/AuthLayout";
+import { getEmailError } from "../utils/validateEmail";
+import { getPhoneError, sanitizePhoneInput } from "../utils/validatePhone";
 
 function Signup() {
   const navigate = useNavigate();
@@ -16,15 +18,42 @@ function Signup() {
   });
 
   const [error, setError] = useState("");
+  const [emailError, setEmailError] = useState("");
+  const [phoneError, setPhoneError] = useState("");
   const [loading, setLoading] = useState(false);
 
   const handleChange = (e) => {
-    setForm({ ...form, [e.target.name]: e.target.value });
+    const { name, value } = e.target;
+
+    if (name === "phone") {
+      const digitsOnly = sanitizePhoneInput(value);
+      setForm({ ...form, phone: digitsOnly });
+      setPhoneError(digitsOnly ? getPhoneError(digitsOnly) : "");
+      return;
+    }
+
+    setForm({ ...form, [name]: value });
+
+    if (name === "email") {
+      setEmailError(value.trim() ? getEmailError(value) : "");
+    }
   };
 
   const handleSignup = async (e) => {
     e.preventDefault();
     setError("");
+
+    const emailValidationError = getEmailError(form.email);
+    if (emailValidationError) {
+      setEmailError(emailValidationError);
+      return;
+    }
+
+    const phoneValidationError = getPhoneError(form.phone);
+    if (phoneValidationError) {
+      setPhoneError(phoneValidationError);
+      return;
+    }
 
     if (form.password !== form.confirmPassword) {
       setError("Passwords do not match");
@@ -89,11 +118,16 @@ function Signup() {
             name="email"
             type="email"
             placeholder="you@example.com"
-            className="auth-input"
+            className={`auth-input ${emailError ? "auth-input-error" : ""}`}
             value={form.email}
             onChange={handleChange}
+            onBlur={() => setEmailError(getEmailError(form.email))}
+            autoComplete="email"
             required
           />
+          {emailError && (
+            <p className="auth-field-error">{emailError}</p>
+          )}
         </div>
 
         <div className="auth-input-group">
@@ -103,12 +137,20 @@ function Signup() {
           <input
             id="signup-phone"
             name="phone"
-            placeholder="+1 234 567 8900"
-            className="auth-input"
+            type="tel"
+            inputMode="numeric"
+            maxLength={10}
+            placeholder="9876543210"
+            className={`auth-input ${phoneError ? "auth-input-error" : ""}`}
             value={form.phone}
             onChange={handleChange}
+            onBlur={() => setPhoneError(getPhoneError(form.phone))}
+            autoComplete="tel"
             required
           />
+          {phoneError && (
+            <p className="auth-field-error">{phoneError}</p>
+          )}
         </div>
 
         <div className="auth-input-group">
