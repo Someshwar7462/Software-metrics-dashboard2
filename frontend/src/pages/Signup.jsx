@@ -1,5 +1,6 @@
 import React, { useState } from "react";
 import { useNavigate, Link } from "react-router-dom";
+import { useAuth } from "../context/AuthContext";
 
 /* ================= PAGE STYLES ================= */
 
@@ -44,6 +45,7 @@ const buttonStyle = {
 
 function Signup() {
   const navigate = useNavigate();
+  const { signup } = useAuth();
 
   const [form, setForm] = useState({
     fullName: "",
@@ -54,36 +56,38 @@ function Signup() {
   });
 
   const [error, setError] = useState("");
-
-  /* ================= HANDLERS ================= */
+  const [loading, setLoading] = useState(false);
 
   const handleChange = (e) => {
     setForm({ ...form, [e.target.name]: e.target.value });
   };
 
-  const handleSignup = (e) => {
+  const handleSignup = async (e) => {
     e.preventDefault();
+    setError("");
 
     if (form.password !== form.confirmPassword) {
       setError("Passwords do not match");
       return;
     }
 
-    // Save user in localStorage (NO BACKEND)
-    localStorage.setItem(
-      "user",
-      JSON.stringify({
+    setLoading(true);
+
+    try {
+      await signup({
         fullName: form.fullName,
         email: form.email,
         phone: form.phone,
         password: form.password,
-      })
-    );
+      });
 
-    navigate("/login");
+      navigate("/login");
+    } catch (err) {
+      setError(err.message || "Signup failed");
+    } finally {
+      setLoading(false);
+    }
   };
-
-  /* ============================================== */
 
   return (
     <div style={pageStyle}>
@@ -147,8 +151,8 @@ function Signup() {
             required
           />
 
-          <button type="submit" style={buttonStyle}>
-            Sign Up
+          <button type="submit" style={buttonStyle} disabled={loading}>
+            {loading ? "Creating account..." : "Sign Up"}
           </button>
         </form>
 

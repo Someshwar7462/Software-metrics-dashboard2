@@ -9,9 +9,13 @@ import Dashboard from "./pages/Dashboard";
 
 import { AuthProvider, useAuth } from "./context/AuthContext";
 
-/* 🔒 Protected Route */
 function PrivateRoute({ children }) {
-  const { user } = useAuth();
+  const { user, loading } = useAuth();
+
+  if (loading) {
+    return null;
+  }
+
   return user ? children : <Navigate to="/login" />;
 }
 
@@ -20,18 +24,12 @@ function App() {
     <AuthProvider>
       <BrowserRouter>
         <Routes>
-          {/* Auth pages */}
           <Route path="/signup" element={<Signup />} />
-<Route path="/login" element={<Login />} />
-<Route path="/repo-input" element={<RepoInput />} />
-<Route path="/dashboard" element={<Dashboard />} />
-
-
+          <Route path="/login" element={<Login />} />
           <Route path="/forgot-password" element={<ForgotPassword />} />
 
-          {/* After login */}
           <Route
-            path="/repo"
+            path="/repo-input"
             element={
               <PrivateRoute>
                 <RepoInput />
@@ -39,7 +37,6 @@ function App() {
             }
           />
 
-          {/* After repo analysis */}
           <Route
             path="/dashboard"
             element={
@@ -49,7 +46,6 @@ function App() {
             }
           />
 
-          {/* Default */}
           <Route path="*" element={<Navigate to="/login" />} />
         </Routes>
       </BrowserRouter>

@@ -1,27 +1,20 @@
 import React, { useState, useRef, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { useTheme } from "../../context/ThemeContext";
+import { useAuth } from "../../context/AuthContext";
 
 function Navbar() {
   const { darkMode, toggleTheme } = useTheme();
+  const { user, logout, updateProfile } = useAuth();
   const navigate = useNavigate();
 
   const [open, setOpen] = useState(false);
   const [showModal, setShowModal] = useState(false);
+  const [profileForm, setProfileForm] = useState(null);
+  const [profileError, setProfileError] = useState("");
+  const [saving, setSaving] = useState(false);
   const dropdownRef = useRef(null);
 
-  const [user, setUser] = useState({
-    name: "Someshwar Gupta",
-    username: "someshwar_01",
-    email: "someshwar@gmail.com",
-    phone: "9876543210",
-    avatar: "https://i.pravatar.cc/150",
-    currentPassword: "",
-    newPassword: "",
-    confirmPassword: "",
-  });
-
-  /* ================= OUTSIDE CLICK ================= */
   useEffect(() => {
     function handleClickOutside(e) {
       if (dropdownRef.current && !dropdownRef.current.contains(e.target)) {
@@ -33,29 +26,81 @@ function Navbar() {
       document.removeEventListener("mousedown", handleClickOutside);
   }, []);
 
-  /* ================= LOGOUT ================= */
+  useEffect(() => {
+    if (user && showModal) {
+      setProfileForm({
+        name: user.name || "",
+        username: user.username || "",
+        email: user.email || "",
+        phone: user.phone || "",
+        avatar: user.avatar || "https://i.pravatar.cc/150",
+        currentPassword: "",
+        newPassword: "",
+        confirmPassword: "",
+      });
+      setProfileError("");
+    }
+  }, [user, showModal]);
+
   const handleLogout = () => {
-    localStorage.removeItem("isLoggedIn");
+    logout();
     navigate("/login");
   };
 
-  /* ================= INPUT CHANGE ================= */
   const handleChange = (e) => {
-    setUser({ ...user, [e.target.name]: e.target.value });
+    setProfileForm({ ...profileForm, [e.target.name]: e.target.value });
   };
 
-  /* ================= IMAGE UPLOAD ================= */
   const handleImageUpload = (e) => {
     const file = e.target.files[0];
-    if (file) {
-      const url = URL.createObjectURL(file);
-      setUser({ ...user, avatar: url });
+    if (!file) return;
+
+    const reader = new FileReader();
+    reader.onloadend = () => {
+      setProfileForm((prev) => ({ ...prev, avatar: reader.result }));
+    };
+    reader.readAsDataURL(file);
+  };
+
+  const handleSaveProfile = async () => {
+    if (!profileForm) return;
+
+    if (
+      profileForm.newPassword &&
+      profileForm.newPassword !== profileForm.confirmPassword
+    ) {
+      setProfileError("New passwords do not match");
+      return;
+    }
+
+    setSaving(true);
+    setProfileError("");
+
+    try {
+      await updateProfile({
+        name: profileForm.name,
+        username: profileForm.username,
+        email: profileForm.email,
+        phone: profileForm.phone,
+        avatar: profileForm.avatar,
+        currentPassword: profileForm.currentPassword || undefined,
+        newPassword: profileForm.newPassword || undefined,
+      });
+
+      setShowModal(false);
+    } catch (err) {
+      setProfileError(err.message || "Failed to update profile");
+    } finally {
+      setSaving(false);
     }
   };
 
+  if (!user) {
+    return null;
+  }
+
   return (
     <>
-      {/* ================= NAVBAR ================= */}
       <header
         style={{
           height: "64px",
@@ -95,10 +140,9 @@ function Navbar() {
             {darkMode ? "☀ Light" : "🌙 Dark"}
           </button>
 
-          {/* PROFILE */}
           <div ref={dropdownRef} style={{ position: "relative" }}>
             <img
-              src={user.avatar}
+              src={user.avatar || "https://i.pravatar.cc/150"}
               alt="profile"
               onClick={() => setOpen(!open)}
               style={{
@@ -109,6 +153,7 @@ function Navbar() {
                 border: darkMode
                   ? "2px solid #38bdf8"
                   : "2px solid #2563eb",
+                objectFit: "cover",
               }}
             />
 
@@ -167,8 +212,7 @@ function Navbar() {
         </div>
       </header>
 
-      {/* ================= EDIT PROFILE MODAL ================= */}
-      {showModal && (
+      {showModal && profileForm && (
         <div style={overlay}>
           <div
             style={{
@@ -181,51 +225,51 @@ function Navbar() {
           >
             <h3 style={{ marginBottom: "12px" }}>Edit Profile</h3>
 
-   {/* PROFILE IMAGE SECTION */}
-<div
-  style={{
-    display: "flex",
-    flexDirection: "column",   // 🔑 MOST IMPORTANT
-    alignItems: "center",
-    marginBottom: "18px",
-  }}
->
-  {/* PROFILE IMAGE */}
-  <img
-    src={user.avatar}
-    alt="profile"
-    style={{
-      width: "90px",
-      height: "90px",
-      borderRadius: "50%",
-      objectFit: "cover",
-      border: "3px solid #2563eb",
-    }}
-  />
+            {profileError && (
+              <p style={{ color: "#ef4444", marginBottom: "12px", fontSize: "14px" }}>
+                {profileError}
+              </p>
+            )}
 
-  {/* CHANGE PHOTO — NOW JUST BELOW IMAGE */}
-  <label
-    style={{
-      marginTop: "8px",          // 🔑 spacing below image
-      fontSize: "14px",
-      fontWeight: "500",
-      color: darkMode ? "#38bdf8" : "#2563eb",
-      cursor: "pointer",
-    }}
-  >
-    Change Photo
-    <input
-      type="file"
-      accept="image/*"
-      style={{ display: "none" }}
-      onChange={handleImageUpload}
-    />
-  </label>
-</div>
+            <div
+              style={{
+                display: "flex",
+                flexDirection: "column",
+                alignItems: "center",
+                marginBottom: "18px",
+              }}
+            >
+              <img
+                src={profileForm.avatar}
+                alt="profile"
+                style={{
+                  width: "90px",
+                  height: "90px",
+                  borderRadius: "50%",
+                  objectFit: "cover",
+                  border: "3px solid #2563eb",
+                }}
+              />
 
+              <label
+                style={{
+                  marginTop: "8px",
+                  fontSize: "14px",
+                  fontWeight: "500",
+                  color: darkMode ? "#38bdf8" : "#2563eb",
+                  cursor: "pointer",
+                }}
+              >
+                Change Photo
+                <input
+                  type="file"
+                  accept="image/*"
+                  style={{ display: "none" }}
+                  onChange={handleImageUpload}
+                />
+              </label>
+            </div>
 
-
-            {/* BASIC INFO */}
             {["name", "username", "email", "phone"].map((field) => (
               <div key={field}>
                 <label style={labelStyle}>
@@ -233,21 +277,20 @@ function Navbar() {
                 </label>
                 <input
                   name={field}
-                  value={user[field]}
+                  value={profileForm[field]}
                   onChange={handleChange}
                   style={inputStyle(darkMode)}
                 />
               </div>
             ))}
 
-            {/* PASSWORD SECTION (NEW – ONLY ADDITION) */}
             <hr style={{ margin: "16px 0", borderColor: "#334155" }} />
 
             <label style={labelStyle}>Current Password</label>
             <input
               type="password"
               name="currentPassword"
-              value={user.currentPassword}
+              value={profileForm.currentPassword}
               onChange={handleChange}
               style={inputStyle(darkMode)}
             />
@@ -256,7 +299,7 @@ function Navbar() {
             <input
               type="password"
               name="newPassword"
-              value={user.newPassword}
+              value={profileForm.newPassword}
               onChange={handleChange}
               style={inputStyle(darkMode)}
             />
@@ -265,14 +308,32 @@ function Navbar() {
             <input
               type="password"
               name="confirmPassword"
-              value={user.confirmPassword}
+              value={profileForm.confirmPassword}
               onChange={handleChange}
               style={inputStyle(darkMode)}
             />
 
-            <div style={{ textAlign: "right", marginTop: "12px" }}>
-              <button onClick={() => setShowModal(false)} style={closeBtn}>
+            <div
+              style={{
+                display: "flex",
+                justifyContent: "flex-end",
+                gap: "10px",
+                marginTop: "12px",
+              }}
+            >
+              <button
+                onClick={() => setShowModal(false)}
+                style={secondaryBtn}
+                disabled={saving}
+              >
                 Close
+              </button>
+              <button
+                onClick={handleSaveProfile}
+                style={closeBtn}
+                disabled={saving}
+              >
+                {saving ? "Saving..." : "Save Profile"}
               </button>
             </div>
           </div>
@@ -281,8 +342,6 @@ function Navbar() {
     </>
   );
 }
-
-/* ================= STYLES ================= */
 
 const DropdownItem = ({ label, onClick, danger, darkMode }) => (
   <div
@@ -333,6 +392,15 @@ const closeBtn = {
   border: "none",
   background: "#2563eb",
   color: "white",
+  cursor: "pointer",
+};
+
+const secondaryBtn = {
+  padding: "6px 14px",
+  borderRadius: "6px",
+  border: "1px solid #cbd5e1",
+  background: "transparent",
+  color: "#64748b",
   cursor: "pointer",
 };
 

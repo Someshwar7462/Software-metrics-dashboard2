@@ -1,7 +1,8 @@
 import React, { useState } from "react";
 import { useNavigate, Link } from "react-router-dom";
+import { useAuth } from "../context/AuthContext";
 
-/* ================= PAGE STYLE (FIXED ERROR) ================= */
+/* ================= PAGE STYLE ================= */
 
 const pageStyle = {
   minHeight: "100vh",
@@ -44,37 +45,27 @@ const buttonStyle = {
 
 function Login() {
   const navigate = useNavigate();
+  const { login } = useAuth();
 
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
+  const [loading, setLoading] = useState(false);
 
-  /* ================= LOGIN HANDLER ================= */
-
-  const handleLogin = (e) => {
+  const handleLogin = async (e) => {
     e.preventDefault();
+    setError("");
+    setLoading(true);
 
-    const storedUser = JSON.parse(localStorage.getItem("user"));
-
-    if (!storedUser) {
-      setError("No account found. Please sign up first.");
-      return;
+    try {
+      await login(email, password);
+      navigate("/repo-input");
+    } catch (err) {
+      setError(err.message || "Invalid email or password");
+    } finally {
+      setLoading(false);
     }
-
-    if (
-      storedUser.email !== email ||
-      storedUser.password !== password
-    ) {
-      setError("Invalid email or password");
-      return;
-    }
-
-    // Login success
-    localStorage.setItem("isLoggedIn", "true");
-    navigate("/repo-input");
   };
-
-  /* ================================================= */
 
   return (
     <div style={pageStyle}>
@@ -108,8 +99,8 @@ function Login() {
             required
           />
 
-          <button type="submit" style={buttonStyle}>
-            Login
+          <button type="submit" style={buttonStyle} disabled={loading}>
+            {loading ? "Logging in..." : "Login"}
           </button>
         </form>
 
