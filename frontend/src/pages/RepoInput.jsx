@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { generateDummyMetrics } from "../utils/dummyMetrics";
+import { repoApi } from "../utils/api";
 import AuthLayout from "../components/common/AuthLayout";
 
 const LOADING_STEPS = [
@@ -104,7 +105,10 @@ function RepoInput() {
         },
       };
 
-      localStorage.setItem("selectedRepo", JSON.stringify(storedData));
+      const saved = await repoApi.saveAnalysis(storedData);
+      const analysisData = saved.analysis || storedData;
+
+      localStorage.setItem("selectedRepo", JSON.stringify(analysisData));
       navigate("/dashboard");
     } catch (err) {
       setError(err.message);

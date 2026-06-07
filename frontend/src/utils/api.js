@@ -45,3 +45,15 @@ export const authApi = {
       body: JSON.stringify(payload),
     }),
 };
+
+export const repoApi = {
+  saveAnalysis: (payload) =>
+    apiRequest("/api/repos/analyze", {
+      method: "POST",
+      body: JSON.stringify(payload),
+    }),
+
+  getLatest: () => apiRequest("/api/repos/latest"),
+
+  getHistory: () => apiRequest("/api/repos/history"),
+};

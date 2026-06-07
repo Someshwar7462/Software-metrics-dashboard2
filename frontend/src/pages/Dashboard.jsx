@@ -1,7 +1,8 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import Navbar from "../components/common/Navbar";
 import Footer from "../components/common/Footer";
 import { useTheme } from "../context/ThemeContext";
+import { repoApi } from "../utils/api";
 
 import MetricCard from "../components/cards/MetricCard";
 import TestCoverageLineChart from "../components/charts/TestCoverageLineChart";
@@ -16,6 +17,24 @@ import {
 
 function Dashboard() {
   const { darkMode } = useTheme();
+  const [storedData, setStoredData] = useState(
+    () => JSON.parse(localStorage.getItem("selectedRepo")) || {}
+  );
+
+  useEffect(() => {
+    const loadAnalysis = async () => {
+      try {
+        const data = await repoApi.getLatest();
+        setStoredData(data);
+        localStorage.setItem("selectedRepo", JSON.stringify(data));
+      } catch {
+        const local = JSON.parse(localStorage.getItem("selectedRepo")) || {};
+        setStoredData(local);
+      }
+    };
+
+    loadAnalysis();
+  }, []);
 
   const pageBg = darkMode ? "#020617" : "#f1f5f9";
   const textColor = darkMode ? "#f8fafc" : "#020617";
@@ -30,9 +49,6 @@ function Dashboard() {
       : "0 6px 16px rgba(0,0,0,0.08)",
   };
 
-  /* ================= SAFE LOCAL STORAGE READ ================= */
-
-  const storedData = JSON.parse(localStorage.getItem("selectedRepo")) || {};
 
   const selectedRepo = storedData.repoInfo || {
     name: "No repository selected",
