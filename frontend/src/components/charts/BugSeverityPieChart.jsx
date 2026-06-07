@@ -7,16 +7,11 @@ import {
   Tooltip,
 } from "recharts";
 import { useTheme } from "../../context/ThemeContext";
-
-const data = [
-  { name: "Critical", value: 4 },
-  { name: "Major", value: 6 },
-  { name: "Minor", value: 2 },
-];
+import { BUG_SEVERITY_DATA } from "../../utils/constants";
 
 const COLORS = ["#ef4444", "#f97316", "#22c55e"];
 
-function BugSeverityPieChart() {
+function BugSeverityPieChart({ data = BUG_SEVERITY_DATA }) {
   const { darkMode } = useTheme();
 
   return (

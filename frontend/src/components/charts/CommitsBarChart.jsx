@@ -11,7 +11,7 @@ import {
 import { COMMITS_DATA } from "../../utils/constants";
 import { useTheme } from "../../context/ThemeContext";
 
-function CommitsBarChart() {
+function CommitsBarChart({ data = COMMITS_DATA }) {
   const { darkMode } = useTheme();
 
   const textColor = darkMode ? "#f8fafc" : "#020617";
@@ -20,9 +20,17 @@ function CommitsBarChart() {
   return (
     <div style={{ width: "100%", height: 260 }}>
       <ResponsiveContainer>
-        <BarChart data={COMMITS_DATA}>
+        <BarChart data={data}>
           <CartesianGrid stroke={gridColor} strokeDasharray="3 3" />
-          <XAxis dataKey="month" stroke={textColor} />
+          <XAxis
+            dataKey="month"
+            stroke={textColor}
+            angle={data.length > 6 ? -35 : 0}
+            textAnchor={data.length > 6 ? "end" : "middle"}
+            height={data.length > 6 ? 60 : 30}
+            tick={{ fontSize: data.length > 6 ? 10 : 12 }}
+            interval={data.length > 12 ? 1 : 0}
+          />
           <YAxis stroke={textColor} />
           <Tooltip
             contentStyle={{

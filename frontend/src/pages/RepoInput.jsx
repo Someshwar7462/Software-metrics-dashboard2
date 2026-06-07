@@ -1,5 +1,6 @@
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
+import { generateDummyMetrics } from "../utils/dummyMetrics";
 
 function RepoInput() {
   const [repoUrl, setRepoUrl] = useState("");
@@ -64,8 +65,10 @@ function RepoInput() {
       }
 
       // -------------------------------
-      // 4️⃣ Store data in localStorage
+      // 4️⃣ Generate dummy metrics (commits stay from GitHub API)
       // -------------------------------
+      const dummyMetrics = generateDummyMetrics(`${owner}/${repo}`, totalCommits);
+
       const storedData = {
         repoInfo: {
           name: repoData.name,
@@ -77,10 +80,15 @@ function RepoInput() {
         },
         metrics: {
           commits: totalCommits,
-          criticalBugs: 0,
-          majorBugs: 0,
-          testCoverage: 0,
+          criticalBugs: dummyMetrics.criticalBugs,
+          majorBugs: dummyMetrics.majorBugs,
+          testCoverage: dummyMetrics.testCoverage,
           buildStatus: "N/A",
+        },
+        chartData: {
+          testCoverageHistory: dummyMetrics.testCoverageHistory,
+          monthlyCommits: dummyMetrics.monthlyCommits,
+          bugSeverity: dummyMetrics.bugSeverity,
         },
       };
 

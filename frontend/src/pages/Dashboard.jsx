@@ -8,6 +8,11 @@ import TestCoverageLineChart from "../components/charts/TestCoverageLineChart";
 import CommitsBarChart from "../components/charts/CommitsBarChart";
 import BugSeverityPieChart from "../components/charts/BugSeverityPieChart";
 import ActionableInsights from "../components/insights/ActionableInsights";
+import {
+  TEST_COVERAGE_DATA,
+  COMMITS_DATA,
+  BUG_SEVERITY_DATA,
+} from "../utils/constants";
 
 function Dashboard() {
   const { darkMode } = useTheme();
@@ -45,6 +50,11 @@ function Dashboard() {
     buildStatus: "N/A",
     commits: 0,
   };
+
+  const chartData = storedData.chartData || {};
+  const testCoverageHistory = chartData.testCoverageHistory || TEST_COVERAGE_DATA;
+  const monthlyCommits = chartData.monthlyCommits || COMMITS_DATA;
+  const bugSeverity = chartData.bugSeverity || BUG_SEVERITY_DATA;
 
   /* ================= KPI DATA (NOW DYNAMIC) ================= */
 
@@ -203,14 +213,14 @@ function Dashboard() {
               <h3 style={{ marginBottom: "12px", color: textColor }}>
                 Test Coverage
               </h3>
-              <TestCoverageLineChart />
+              <TestCoverageLineChart data={testCoverageHistory} />
             </div>
 
             <div style={cardStyle}>
               <h3 style={{ marginBottom: "12px", color: textColor }}>
                 Commits
               </h3>
-              <CommitsBarChart />
+              <CommitsBarChart data={monthlyCommits} />
             </div>
           </div>
         </section>
@@ -228,7 +238,7 @@ function Dashboard() {
               <h3 style={{ marginBottom: "12px", color: textColor }}>
                 Bug Severity
               </h3>
-              <BugSeverityPieChart />
+              <BugSeverityPieChart data={bugSeverity} />
             </div>
 
             <div style={{ ...cardStyle, height: "360px" }}>
