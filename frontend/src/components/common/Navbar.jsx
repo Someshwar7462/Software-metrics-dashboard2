@@ -2,6 +2,8 @@ import React, { useState, useRef, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { useTheme } from "../../context/ThemeContext";
 import { useAuth } from "../../context/AuthContext";
+import ProfileAvatar from "./ProfileAvatar";
+import { hasProfileAvatar } from "../../utils/profileAvatar";
 
 function Navbar() {
   const { darkMode, toggleTheme } = useTheme();
@@ -33,7 +35,7 @@ function Navbar() {
         username: user.username || "",
         email: user.email || "",
         phone: user.phone || "",
-        avatar: user.avatar || "https://i.pravatar.cc/150",
+        avatar: user.avatar || "",
         currentPassword: "",
         newPassword: "",
         confirmPassword: "",
@@ -54,6 +56,18 @@ function Navbar() {
   const handleImageUpload = (e) => {
     const file = e.target.files[0];
     if (!file) return;
+
+    if (!file.type.startsWith("image/")) {
+      setProfileError("Please select a valid image file");
+      return;
+    }
+
+    if (file.size > 2 * 1024 * 1024) {
+      setProfileError("Image must be smaller than 2MB");
+      return;
+    }
+
+    setProfileError("");
 
     const reader = new FileReader();
     reader.onloadend = () => {
@@ -77,15 +91,24 @@ function Navbar() {
     setProfileError("");
 
     try {
-      await updateProfile({
+      const payload = {
         name: profileForm.name,
         username: profileForm.username,
         email: profileForm.email,
         phone: profileForm.phone,
-        avatar: profileForm.avatar,
         currentPassword: profileForm.currentPassword || undefined,
         newPassword: profileForm.newPassword || undefined,
-      });
+      };
+
+      if (
+        profileForm.avatar &&
+        profileForm.avatar.startsWith("data:image/") &&
+        profileForm.avatar !== user.avatar
+      ) {
+        payload.avatar = profileForm.avatar;
+      }
+
+      await updateProfile(payload);
 
       setShowModal(false);
     } catch (err) {
@@ -141,20 +164,12 @@ function Navbar() {
           </button>
 
           <div ref={dropdownRef} style={{ position: "relative" }}>
-            <img
-              src={user.avatar || "https://i.pravatar.cc/150"}
-              alt="profile"
+            <ProfileAvatar
+              name={user.name}
+              avatar={user.avatar}
+              size={36}
+              darkMode={darkMode}
               onClick={() => setOpen(!open)}
-              style={{
-                width: "36px",
-                height: "36px",
-                borderRadius: "50%",
-                cursor: "pointer",
-                border: darkMode
-                  ? "2px solid #38bdf8"
-                  : "2px solid #2563eb",
-                objectFit: "cover",
-              }}
             />
 
             {open && (
@@ -239,17 +254,26 @@ function Navbar() {
                 marginBottom: "18px",
               }}
             >
-              <img
-                src={profileForm.avatar}
-                alt="profile"
-                style={{
-                  width: "90px",
-                  height: "90px",
-                  borderRadius: "50%",
-                  objectFit: "cover",
-                  border: "3px solid #2563eb",
-                }}
+              <ProfileAvatar
+                name={profileForm.name}
+                avatar={profileForm.avatar}
+                size={90}
+                darkMode={darkMode}
+                borderWidth={3}
               />
+
+              {!hasProfileAvatar(profileForm.avatar) && (
+                <p
+                  style={{
+                    marginTop: "8px",
+                    fontSize: "12px",
+                    color: "#94a3b8",
+                    textAlign: "center",
+                  }}
+                >
+                  No photo yet. Upload one below.
+                </p>
+              )}
 
               <label
                 style={{

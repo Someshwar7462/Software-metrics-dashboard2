@@ -7,14 +7,19 @@ const JWT_SECRET = process.env.JWT_SECRET || "metrics_dashboard_secret";
 const generateToken = (id) =>
   jwt.sign({ id }, JWT_SECRET, { expiresIn: "30d" });
 
-const formatUserResponse = (user) => ({
-  id: user._id,
-  name: user.name,
-  email: user.email,
-  phone: user.phone,
-  username: user.username,
-  avatar: user.avatar,
-});
+const formatUserResponse = (user) => {
+  const avatar =
+    user.avatar && !user.avatar.includes("pravatar.cc") ? user.avatar : "";
+
+  return {
+    id: user._id,
+    name: user.name,
+    email: user.email,
+    phone: user.phone,
+    username: user.username,
+    avatar,
+  };
+};
 
 exports.signup = async (req, res) => {
   try {
@@ -116,7 +121,10 @@ exports.updateProfile = async (req, res) => {
     if (name) user.name = name.trim();
     if (username !== undefined) user.username = username.trim();
     if (phone !== undefined) user.phone = phone.trim();
-    if (avatar) user.avatar = avatar;
+
+    if (avatar && avatar.startsWith("data:image/")) {
+      user.avatar = avatar;
+    }
 
     if (email && email.toLowerCase().trim() !== user.email) {
       const emailTaken = await User.findOne({
