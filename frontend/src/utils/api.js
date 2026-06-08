@@ -44,6 +44,12 @@ export const authApi = {
       method: "PUT",
       body: JSON.stringify(payload),
     }),
+
+  forgotPassword: (payload) =>
+    apiRequest("/api/auth/forgot-password", {
+      method: "POST",
+      body: JSON.stringify(payload),
+    }),
 };
 
 export const repoApi = {

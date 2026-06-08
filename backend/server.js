@@ -3,7 +3,6 @@ require("dotenv").config();
 const cors = require("cors");
 
 const connectDB = require("./config/db");
-connectDB();
 
 const app = express();
 
@@ -25,6 +24,21 @@ app.use("/api/dashboard", require("./routes/dashboardRoutes"));
 
 const PORT = process.env.PORT || 5000;
 
-app.listen(PORT, "127.0.0.1", () => {
-  console.log(`Server running on http://127.0.0.1:${PORT}`);
-});
+const startServer = async () => {
+  try {
+    await connectDB();
+
+    app.listen(PORT, "127.0.0.1", () => {
+      console.log(`Server running on http://127.0.0.1:${PORT}`);
+    });
+  } catch (error) {
+    console.error("Failed to start server:", error.message);
+    console.error("");
+    console.error("Quick fixes:");
+    console.error("1. Start local MongoDB: brew services start mongodb-community");
+    console.error("2. Or allow your IP in MongoDB Atlas → Network Access");
+    process.exit(1);
+  }
+};
+
+startServer();

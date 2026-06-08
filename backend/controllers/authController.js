@@ -3,6 +3,8 @@ const jwt = require("jsonwebtoken");
 const User = require("../models/userModel");
 const { isValidEmail } = require("../utils/validateEmail");
 const { isValidPhone } = require("../utils/validatePhone");
+const { handleDbError } = require("../utils/dbError");
+const { isUsingLocalFallback } = require("../config/db");
 
 const JWT_SECRET = process.env.JWT_SECRET || "metrics_dashboard_secret";
 
@@ -78,7 +80,7 @@ exports.signup = async (req, res) => {
       user: formatUserResponse(user),
     });
   } catch (error) {
-    res.status(500).json({ message: error.message || "Signup failed" });
+    return handleDbError(res, error, "Signup failed");
   }
 };
 
@@ -95,6 +97,13 @@ exports.login = async (req, res) => {
     const user = await User.findOne({ email: email.toLowerCase().trim() });
 
     if (!user || !(await bcrypt.compare(password, user.password))) {
+      if (!user && isUsingLocalFallback()) {
+        return res.status(401).json({
+          message:
+            "Invalid email or password. If you signed up earlier, your account may be in MongoDB Atlas. Allow your IP in Atlas Network Access and restart the backend.",
+        });
+      }
+
       return res.status(401).json({ message: "Invalid email or password" });
     }
 
@@ -103,7 +112,7 @@ exports.login = async (req, res) => {
       user: formatUserResponse(user),
     });
   } catch (error) {
-    res.status(500).json({ message: error.message || "Login failed" });
+    return handleDbError(res, error, "Login failed");
   }
 };
 
@@ -118,6 +127,57 @@ exports.getProfile = async (req, res) => {
     res.json(formatUserResponse(user));
   } catch (error) {
     res.status(500).json({ message: error.message || "Failed to fetch profile" });
+  }
+};
+
+exports.forgotPassword = async (req, res) => {
+  try {
+    const { email, password, confirmPassword } = req.body;
+
+    if (!email || !password || !confirmPassword) {
+      return res.status(400).json({
+        message: "Please provide email, new password and confirm password",
+      });
+    }
+
+    if (!isValidEmail(email)) {
+      return res.status(400).json({
+        message: "Please enter a valid email address (e.g. you@example.com)",
+      });
+    }
+
+    if (password.length < 6) {
+      return res.status(400).json({
+        message: "Password must be at least 6 characters",
+      });
+    }
+
+    if (password !== confirmPassword) {
+      return res.status(400).json({ message: "Passwords do not match" });
+    }
+
+    const normalizedEmail = email.toLowerCase().trim();
+    const user = await User.findOne({ email: normalizedEmail });
+
+    if (!user) {
+      if (isUsingLocalFallback()) {
+        return res.status(404).json({
+          message:
+            "No account found on the local database. Your account is likely saved in MongoDB Atlas cloud, but the server cannot reach it. Open MongoDB Atlas → Network Access → Add IP Address → Allow access from anywhere (0.0.0.0/0), then restart the backend and try again.",
+        });
+      }
+
+      return res.status(404).json({
+        message: "No account found with this email address",
+      });
+    }
+
+    user.password = await bcrypt.hash(password, 10);
+    await user.save();
+
+    res.json({ message: "Password reset successfully. You can now sign in." });
+  } catch (error) {
+    return handleDbError(res, error, "Failed to reset password");
   }
 };
 
